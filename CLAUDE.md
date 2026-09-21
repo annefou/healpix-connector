@@ -27,3 +27,16 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 
 - Commit as `Anne Fouilloux <anne.fouilloux@lifewatch.eu>`. No Co-Authored-By trailer
   (destined for the GRID4EARTH organisation).
+
+## Temporary code (to move upstream once test 1 settles the method)
+
+- `binning.py` → healpix-resample: per-sample weights + `std`/`var` on `GroupByResampler`
+  (it already supports WGS84; its reductions are unweighted mean/sum/min/max/prod).
+- `sources/chelsa.py` (and a future WorldClim converter) → healpix-convert, beside ERA5,
+  Climate DT and CAMS. Its converters handle non-Zarr inputs (ERA5 downloads GRIB) and it
+  already depends on rasterix.
+- Also to report: healpix-resample's `OverlapConservativeResampler` is sphere-only (geodetic
+  `sin(lat)`, `ellipsoid="sphere"` hard-coded; its docstring says an authalic variant only
+  changes the lat→z mapping). Ask for an `ellipsoid` option so its cell ids match WGS84.
+- Issues are drafted only when everything is in place (Anne, 2026-09-21). After the upstream
+  PRs land, delete the local converter; the connector reads converted data through STAC.
