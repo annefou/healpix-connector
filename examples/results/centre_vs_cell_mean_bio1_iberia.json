@@ -1,0 +1,74 @@
+{
+  "source": {
+    "name": "CHELSA v2.1 climatologies",
+    "doi": "10.16904/envidat.228",
+    "license": "CC0-1.0",
+    "version": "2.1",
+    "reference_period": [
+      "1981-01-01",
+      "2010-12-31"
+    ],
+    "url_template": "https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio{n}_1981-2010_V.2.1.tif"
+  },
+  "bbox": [
+    -10.0,
+    35.0,
+    4.0,
+    44.0
+  ],
+  "variable": "bio1 (degC)",
+  "depths": {
+    "6": {
+      "cell_width_km": 101.87,
+      "cells": 120,
+      "min_coverage": 0.998,
+      "abs_diff_mean_degC": 0.573,
+      "abs_diff_p95_degC": 1.897,
+      "abs_diff_max_degC": 3.102,
+      "share_abs_diff_gt_0.5C": 0.4,
+      "share_abs_diff_gt_1C": 0.2083,
+      "within_cell_std_median_degC": 0.862,
+      "within_cell_std_p95_degC": 2.735,
+      "within_cell_range_max_degC": 20.0
+    },
+    "7": {
+      "cell_width_km": 50.93,
+      "cells": 479,
+      "min_coverage": 0.996,
+      "abs_diff_mean_degC": 0.409,
+      "abs_diff_p95_degC": 1.467,
+      "abs_diff_max_degC": 5.863,
+      "share_abs_diff_gt_0.5C": 0.261,
+      "share_abs_diff_gt_1C": 0.1169,
+      "within_cell_std_median_degC": 0.565,
+      "within_cell_std_p95_degC": 2.202,
+      "within_cell_range_max_degC": 19.0
+    },
+    "8": {
+      "cell_width_km": 25.47,
+      "cells": 1849,
+      "min_coverage": 0.987,
+      "abs_diff_mean_degC": 0.306,
+      "abs_diff_p95_degC": 1.295,
+      "abs_diff_max_degC": 4.312,
+      "share_abs_diff_gt_0.5C": 0.1925,
+      "share_abs_diff_gt_1C": 0.0779,
+      "within_cell_std_median_degC": 0.329,
+      "within_cell_std_p95_degC": 1.78,
+      "within_cell_range_max_degC": 18.9
+    },
+    "9": {
+      "cell_width_km": 12.73,
+      "cells": 7364,
+      "min_coverage": 0.953,
+      "abs_diff_mean_degC": 0.231,
+      "abs_diff_p95_degC": 0.971,
+      "abs_diff_max_degC": 4.579,
+      "share_abs_diff_gt_0.5C": 0.1346,
+      "share_abs_diff_gt_1C": 0.0482,
+      "within_cell_std_median_degC": 0.207,
+      "within_cell_std_p95_degC": 1.356,
+      "within_cell_range_max_degC": 15.7
+    }
+  }
+}

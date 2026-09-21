@@ -17,5 +17,11 @@ pytest = ">=8"
 [feature.test.tasks]
 test = "pytest -q"
 
+[feature.convert.dependencies]
+rasterio = ">=1.3"
+xarray = ">=2024.1"
+zarr = ">=3"
+
 [environments]
-test = ["test"]
+test = ["test", "convert"]
+convert = ["convert"]

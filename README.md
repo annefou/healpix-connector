@@ -4,7 +4,7 @@ Connect existing data repositories to the [HEALPix](https://healpix.sourceforge.
 
 Every value it returns states its **support** (HEALPix depth), its **valid time** and its **uncertainty**, together with the identifiers needed to cite and reproduce it.
 
-> **Status: planning.** This repository holds the package skeleton. Nothing is usable yet.
+> **Status: early development.** The CHELSA converter works for bio1 (`healpix_connector.sources.chelsa`); see `examples/` for the first comparison. Occurrence connectors are next.
 
 ## What it will do
 
