@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: healpix-connector
+message: >-
+  If you use healpix-connector, please cite it using the metadata in this file.
+type: software
+authors:
+  - family-names: Fouilloux
+    given-names: Anne
+    orcid: https://orcid.org/0000-0002-1784-2920
+    affiliation: LifeWatch ERIC
+repository-code: https://github.com/annefou/healpix-connector
+abstract: >-
+  Connects existing data repositories (GBIF, OBIS, Living Atlases, STAC
+  sources) to the HEALPix discrete global grid used by GRID4EARTH, returning
+  every value with its declared support, valid time, uncertainty and
+  provenance.
+keywords:
+  - HEALPix
+  - DGGS
+  - biodiversity
+  - GBIF
+  - OBIS
+  - data fusion
+  - GRID4EARTH

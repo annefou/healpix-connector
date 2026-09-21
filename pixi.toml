@@ -1,0 +1,21 @@
+[workspace]
+name = "healpix-connector"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64"]
+
+[dependencies]
+python = ">=3.11,<3.14"
+healpix-geo = ">=0.4.1"
+numpy = ">=1.26"
+
+[pypi-dependencies]
+healpix-connector = { path = ".", editable = true }
+
+[feature.test.dependencies]
+pytest = ">=8"
+
+[feature.test.tasks]
+test = "pytest -q"
+
+[environments]
+test = ["test"]

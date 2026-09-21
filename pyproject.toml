@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "healpix-connector"
+version = "0.0.1"
+description = "Connect existing data repositories (GBIF, OBIS, Living Atlases, STAC sources) to the HEALPix DGGS, with declared support, valid time, uncertainty and provenance."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Anne Fouilloux", email = "anne.fouilloux@lifewatch.eu" }]
+keywords = ["HEALPix", "DGGS", "biodiversity", "GBIF", "OBIS", "data fusion", "GRID4EARTH"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+dependencies = [
+    "healpix-geo>=0.4.1",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+# Occurrence connectors (GBIF, OBIS, Living Atlases).
+biodiversity = ["requests>=2.31"]
+# Environmental-source converters (GeoTIFF climatologies such as CHELSA, WorldClim).
+convert = ["healpix-resample>=2026.7.0", "rioxarray>=0.15", "xarray>=2024.1", "zarr>=2.17"]
+# The MCP server; the library and CLI never require it.
+mcp = ["mcp>=1.2"]
+test = ["pytest>=8"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/healpix_connector"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
