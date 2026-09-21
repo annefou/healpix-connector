@@ -26,3 +26,7 @@ pixi run -e test test
 ## Credits
 
 Developed by [LifeWatch ERIC](https://www.lifewatch.eu) within GRID4EARTH, an ESA Digital Twin Earth project.
+
+## Licence
+
+[MIT](LICENSE).

@@ -8,11 +8,14 @@ version = "0.0.1"
 description = "Connect existing data repositories (GBIF, OBIS, Living Atlases, STAC sources) to the HEALPix DGGS, with declared support, valid time, uncertainty and provenance."
 readme = "README.md"
 requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Anne Fouilloux", email = "anne.fouilloux@lifewatch.eu" }]
 keywords = ["HEALPix", "DGGS", "biodiversity", "GBIF", "OBIS", "data fusion", "GRID4EARTH"]
 classifiers = [
     "Development Status :: 1 - Planning",
     "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: GIS",
 ]
