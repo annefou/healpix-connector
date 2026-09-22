@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "healpix-connector"
-version = "0.0.1"
+version = "0.1.0"
 description = "Connect existing data repositories (GBIF, OBIS, Living Atlases, STAC sources) to the HEALPix DGGS, with declared support, valid time, uncertainty and provenance."
 readme = "README.md"
 requires-python = ">=3.11"

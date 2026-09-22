@@ -1,25 +1,47 @@
 cff-version: 1.2.0
-title: healpix-connector
-message: >-
-  If you use healpix-connector, please cite it using the metadata in this file.
-type: software
-authors:
-  - family-names: Fouilloux
-    given-names: Anne
-    orcid: https://orcid.org/0000-0002-1784-2920
-    affiliation: LifeWatch ERIC
-repository-code: https://github.com/annefou/healpix-connector
+message: "If you use this software, please cite it using the metadata from this file."
+title: "healpix-connector: connect existing data repositories to the HEALPix grid, with declared support, valid time and uncertainty"
 abstract: >-
-  Connects existing data repositories (GBIF, OBIS, Living Atlases, STAC
-  sources) to the HEALPix discrete global grid used by GRID4EARTH, returning
-  every value with its declared support, valid time, uncertainty and
-  provenance.
+  A Python library that puts data from existing repositories onto the HEALPix
+  discrete global grid as GRID4EARTH uses it (NESTED ordering on the WGS84
+  ellipsoid), and states for every value the support it was measured over, the
+  time it is valid for, and its uncertainty. Occurrence records are read from
+  their repository on request, never mirrored, and are returned with the cells
+  their positional uncertainty covers, the download DOI and the taxonomy used.
+  Environmental sources are read as zarr-conventions/dggs datasets described by
+  a STAC item; converters are provided for CHELSA climatologies, and Climate DT
+  is read through GRID4EARTH's healpix-convert.
+type: software
+license: MIT
+repository-code: "https://github.com/annefou/healpix-connector"
+version: "0.1.0"
+date-released: "2026-09-22"
+authors:
+  - family-names: "Fouilloux"
+    given-names: "Anne"
+    orcid: "https://orcid.org/0000-0002-1784-2920"
+    affiliation: "LifeWatch ERIC"
+  - name: "LifeWatch ERIC"
+    website: "https://www.lifewatch.eu"
+    alias: "https://ror.org/04c04g438"
+# A concept DOI is minted by Zenodo at the first GitHub release; add it here then.
 keywords:
   - HEALPix
   - DGGS
   - biodiversity
   - GBIF
-  - OBIS
   - data fusion
   - GRID4EARTH
-license: MIT
+  - reproducibility
+references:
+  - type: software
+    title: "healpix-convert"
+    repository-code: "https://github.com/GRID4EARTH/healpix-convert"
+    authors:
+      - name: "GRID4EARTH"
+  - type: software
+    title: "healpix-resample"
+    doi: "10.5281/zenodo.21723671"
+    repository-code: "https://github.com/GRID4EARTH/healpix-resample"
+    authors:
+      - name: "GRID4EARTH"
