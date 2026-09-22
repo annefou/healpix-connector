@@ -1,7 +1,12 @@
-# Upstream issues (drafts, not filed)
+# Upstream issues
 
 Five requests, written to stand on their own: a maintainer should not need to know what
-healpix-connector is to act on them. Checked against `main` on 2026-09-22
+healpix-connector is to act on them. **All five were filed on 2026-09-22:**
+healpix-resample [#63](https://github.com/GRID4EARTH/healpix-resample/issues/63) (1),
+[#64](https://github.com/GRID4EARTH/healpix-resample/issues/64) (2),
+[#65](https://github.com/GRID4EARTH/healpix-resample/issues/65) (3); healpix-convert
+[#12](https://github.com/GRID4EARTH/healpix-convert/issues/12) (4),
+[#11](https://github.com/GRID4EARTH/healpix-convert/issues/11) (5). Checked against `main` on 2026-09-22
 (healpix-resample `2026.7.0` released, `main` newer; healpix-convert `2026.9.0`).
 
 **Landscape.** healpix-resample: 5 open PRs (4 dependabot, #57 notebooks environment)
