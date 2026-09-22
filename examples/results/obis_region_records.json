@@ -1,0 +1,81 @@
+{
+  "taxon": {
+    "query": "Delphinus delphis",
+    "backbone": "WoRMS",
+    "aphia_id": 137094,
+    "name": "Delphinus delphis",
+    "rank": "Species",
+    "accepted_name": "Delphinus delphis",
+    "matches": 1
+  },
+  "region_statistics": {
+    "records": 104138,
+    "species": 1731,
+    "taxa": 2593,
+    "datasets": 101,
+    "year_range": [
+      1870,
+      2026
+    ]
+  },
+  "provenance": {
+    "source": "OBIS occurrence API",
+    "api": "https://api.obis.org/v3/occurrence",
+    "params": {
+      "geometry": "POLYGON((-9.550000 41.950000,-8.450000 41.950000,-8.450000 43.050000,-9.550000 43.050000,-9.550000 41.950000))",
+      "taxonid": 137094,
+      "startdate": "2015-01-01",
+      "enddate": "2024-12-31"
+    },
+    "backbone": "WoRMS",
+    "matched_in_query_polygon": 121,
+    "kept_in_region": 115,
+    "datasets": [
+      "86453e9e-24f5-47b1-b442-b6f86a9979b7",
+      "a9818622-ac1a-4690-a26f-7e57f387bf5c",
+      "eaea291a-1e1d-4382-b86f-ac3cc15b8d5a"
+    ],
+    "query_doi": null,
+    "retrieved_at": "2026-09-22T20:44:07+00:00",
+    "producer": "healpix-connector 0.0.1"
+  },
+  "records": 115,
+  "cells": [
+    218777,
+    218779,
+    218780,
+    218781,
+    218782,
+    218783,
+    218801,
+    218803,
+    218804,
+    218806,
+    218809,
+    218811,
+    218812
+  ],
+  "with_known_uncertainty": 31,
+  "flags_seen": [],
+  "example": {
+    "obisID": "00c24065-fd58-4c1f-9ba3-1ac0976c3fc9",
+    "occurrenceID": "OC_ES_PELACUS_R00004_2015_DELDEL_1",
+    "dataset_id": "a9818622-ac1a-4690-a26f-7e57f387bf5c",
+    "eventDate": "2015-03-18",
+    "year": 2015,
+    "decimalLongitude": -9.2445,
+    "decimalLatitude": 42.3835,
+    "coordinateUncertaintyInMeters": null,
+    "basisOfRecord": "HumanObservation",
+    "taxon_name": "Delphinus delphis",
+    "aphia_id": 137094,
+    "flags": [],
+    "backbone": "WoRMS",
+    "depth": 8,
+    "cell": 218801,
+    "footprint_cells": [
+      218801
+    ],
+    "footprint_known": false
+  }
+}

@@ -16,6 +16,11 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - GBIF: always send `checklistKey` and record the taxonomy + version used. GBIF.org
   defaults to Catalogue of Life XR; the occurrence API still defaults to the legacy
   backbone. Use `gbifID` for record identity.
+- OBIS: taxonomy is **WoRMS** (AphiaID), paging is a **cursor** (`after`), and there is
+  **no DOI for a query** - pin a result by its dataset ids plus the retrieval date. Pass
+  OBIS's own `flags` (ON_LAND, NO_DEPTH, DEPTH_EXCEEDS_BATH, NO_ACCEPTED_NAME) through
+  rather than filtering on them. Count with `/statistics` before paging, and give it the
+  same taxon and filters as the search or the count describes a different query.
 - Time matching keys on `eventDate`, never on publication date; report both.
 - Library first: CLI and MCP only wrap library functions. No LLM in any pipeline.
 
@@ -76,3 +81,7 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - healpix-convert pulls `torch`; the CUDA wheels do not fit on a normal working disk, so the
   `climatedt` feature pins the CPU wheel via the PyTorch CPU index.
 - GBIF answers 429 to bursts; `_get` retries on 429 and 5xx, honouring `Retry-After`.
+- OBIS (measured 2026-09-22): `size` caps at 10,000 (10,001 -> HTTP 400); `after` cursor
+  paging works; `fields=` trims the 68-field record; `/statistics` returns records, species,
+  taxa, datasets and yearrange for a region without paging. Positional uncertainty is
+  usually absent - 23 of 200 records in a Galician box stated it.

@@ -1,0 +1,14 @@
+{
+  "id": "000028f9-558a-4e62-ae93-43fded0f333a",
+  "occurrenceID": "24156759644",
+  "dataset_id": "cd6933a8-797e-41f4-94f0-fcd969b6794e",
+  "scientificName": "Delphinus delphis",
+  "aphiaID": 137094,
+  "eventDate": "2022-10-28T10:02:11Z",
+  "date_year": 2022,
+  "decimalLongitude": -8.827534675598145,
+  "decimalLatitude": 42.11404800415039,
+  "coordinateUncertaintyInMeters": null,
+  "basisOfRecord": "MachineObservation",
+  "flags": ["NO_DEPTH", "ON_LAND"]
+}
