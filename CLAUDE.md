@@ -37,7 +37,7 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   already depends on rasterix.
 - `sources/climatedt.MonthConverter` → healpix-convert: `ClimateDTConverter` takes a single
   date and builds its cache name from it, so a MARS date range (which Polytope accepts, and
-  which turns ~90,000 requests for a decade into 120) cannot be cached. Ask for a date range
+  which turns 7,305 requests for a decade into 120) cannot be cached. Ask for a date range
   plus a filename-safe cache tag; everything else there is used unchanged.
 - Also to report: `PSFResampler` has no non-negativity constraint, so on precipitation it
   rings into negative values (114 of 480 Iberian cells, a January mean; `lam` up to 0.1 only

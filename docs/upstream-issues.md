@@ -103,7 +103,8 @@ range, and the request the converter already builds passes one through untouched
 `"20300101/to/20300131"` cannot be a file name, so a range cannot be cached.
 
 Asked a month at a time, twenty years is **240 requests**. Asked a timestep at a time,
-it is about **175,000**.
+it is **14,610** (7,305 days x two times a day), since a request already carries both
+variables at once.
 
 healpix-connector therefore subclasses the converter (`sources/climatedt.MonthConverter`)
 for no reason other than to sanitise that file name.
