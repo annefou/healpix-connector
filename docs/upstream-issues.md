@@ -89,19 +89,28 @@ it also writes a zarr skeleton, so code that only wants the GRIB calls `_downloa
 is 240 requests a month at a time, against 14,610 a timestep at a time (7,305 days,
 twice a day; a request already carries both variables).
 
-## 5. healpix-convert — would you like a CHELSA converter (and WorldClim after it)?
+## 5. healpix-convert — where should converters for new datasets live?
 
-**Offer.** A converter for CHELSA v2.1 bioclimatic layers (~1 km GeoTIFFs, CC0, DOI
-10.16904/envidat.228) to zarr-conventions/dggs v1 with the CF grid mapping and a STAC
-item — the same output shape as the ERA5, CAMS and Climate DT converters. It needs
-rasterio; healpix-convert already depends on rasterix. WorldClim would follow the same
-path.
+**Question first.** Is healpix-convert meant to grow one converter per dataset, so that
+a new source is contributed here beside ERA5, CAMS and Climate DT? Or is it a core plus
+a pattern, with each project carrying its own converters and only the conventions,
+STAC and grid handling shared?
 
-**Why here.** Species-distribution and biodiversity work is built on CHELSA and
-WorldClim far more than on reanalysis, so these are the layers people arrive with.
+The answer decides where anyone bringing a new dataset should put their work, and it is
+not written down anywhere we could find. If the answer is "here", it would help to say
+what a converter has to provide to be accepted — output conventions, STAC item, tests,
+which dependencies are acceptable.
 
-**One trap worth carrying upstream.** CHELSA's specification gives `bio4` in degC, but
-the published values are 100x the standard deviation: 495.75 against 4.96 computed from
-ERA5 for the same cells and period.
+**Concrete case.** If the answer is "here", we would like to contribute a converter for
+CHELSA v2.1 bioclimatic layers (~1 km GeoTIFFs, CC0, DOI 10.16904/envidat.228), and
+WorldClim on the same path afterwards. Species-distribution and biodiversity work is
+built on those far more than on reanalysis, so they are the layers people arrive with.
 
-Working code exists and can be opened as a PR if you want it.
+Working code exists: it writes zarr-conventions/dggs v1 with the CF grid mapping and a
+STAC item, the same output shape as the existing converters, and needs rasterio
+(healpix-convert already depends on rasterix). Happy to open it as a PR, or to keep it
+downstream and follow whatever pattern you prefer.
+
+**One trap worth carrying upstream either way.** CHELSA's specification gives `bio4` in
+degC, but the published values are 100x the standard deviation: 495.75 against 4.96
+computed from ERA5 for the same cells and period.
