@@ -40,3 +40,10 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   changes the lat→z mapping). Ask for an `ellipsoid` option so its cell ids match WGS84.
 - Issues are drafted only when everything is in place (Anne, 2026-09-21). After the upstream
   PRs land, delete the local converter; the connector reads converted data through STAC.
+
+## Measured limits (do not rediscover)
+
+- GBIF search + geometry filter: deep paging collapses. One depth-8 cell, 2026-09-22:
+  0.5 s per page at offset 0, 0.4 s at 6,000, **361 s at 12,000**. Hence
+  `gbif.PRACTICAL_PAGING_LIMIT = 5,000`; beyond that use a download.
+- GBIF answers 429 to bursts; `_get` retries on 429 and 5xx, honouring `Retry-After`.

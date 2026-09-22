@@ -26,7 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # Occurrence connectors (GBIF, OBIS, Living Atlases).
-biodiversity = ["requests>=2.31"]
+biodiversity = ["requests>=2.31", "pandas>=2.1"]
 # Environmental-source converters (GeoTIFF climatologies such as CHELSA, WorldClim).
 convert = ["healpix-resample>=2026.7.0", "rioxarray>=0.15", "xarray>=2024.1", "zarr>=2.17"]
 # The MCP server; the library and CLI never require it.

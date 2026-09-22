@@ -1,0 +1,60 @@
+{
+ "key": 4998639863,
+ "gbifID": "4998639863",
+ "occurrenceID": "0d71eae7-ad14-4d96-ae98-f6aa70641dc7",
+ "datasetKey": "09435c69-7ec7-46f4-b52f-5131baa10143",
+ "eventDate": "1942-06",
+ "decimalLatitude": 40.583333,
+ "decimalLongitude": -5.916667,
+ "coordinateUncertaintyInMeters": 301.0,
+ "basisOfRecord": "PRESERVED_SPECIMEN",
+ "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+ "classifications": {
+  "7ddf754f-d193-4cc9-b351-99906754a03b": {
+   "usage": {
+    "key": "Q2M4",
+    "name": "Calopteryx splendens (Harris, 1780)",
+    "rank": "SPECIES",
+    "code": "ZOOLOGICAL",
+    "authorship": "(Harris, 1780)",
+    "genericName": "Calopteryx",
+    "specificEpithet": "splendens",
+    "formattedName": "<i>Calopteryx</i> <i>splendens</i> (Harris, 1780)"
+   },
+   "acceptedUsage": {
+    "key": "Q2M4",
+    "name": "Calopteryx splendens (Harris, 1780)",
+    "rank": "SPECIES",
+    "code": "ZOOLOGICAL",
+    "authorship": "(Harris, 1780)",
+    "genericName": "Calopteryx",
+    "specificEpithet": "splendens",
+    "formattedName": "<i>Calopteryx</i> <i>splendens</i> (Harris, 1780)"
+   },
+   "taxonomicStatus": "ACCEPTED"
+  },
+  "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c": {
+   "usage": {
+    "key": "1427067",
+    "name": "Calopteryx splendens (Harris, 1780)",
+    "rank": "SPECIES",
+    "code": "ZOOLOGICAL",
+    "authorship": "(Harris, 1780)",
+    "genericName": "Calopteryx",
+    "specificEpithet": "splendens",
+    "formattedName": "<i>Calopteryx</i> <i>splendens</i> (Harris, 1780)"
+   },
+   "acceptedUsage": {
+    "key": "1427067",
+    "name": "Calopteryx splendens (Harris, 1780)",
+    "rank": "SPECIES",
+    "code": "ZOOLOGICAL",
+    "authorship": "(Harris, 1780)",
+    "genericName": "Calopteryx",
+    "specificEpithet": "splendens",
+    "formattedName": "<i>Calopteryx</i> <i>splendens</i> (Harris, 1780)"
+   },
+   "taxonomicStatus": "ACCEPTED"
+  }
+ }
+}

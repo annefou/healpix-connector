@@ -22,6 +22,10 @@ rasterio = ">=1.3"
 xarray = ">=2024.1"
 zarr = ">=3"
 
+[feature.biodiversity.dependencies]
+requests = ">=2.31"
+pandas = ">=2.1"
+
 [environments]
-test = ["test", "convert"]
+test = ["test", "convert", "biodiversity"]
 convert = ["convert"]

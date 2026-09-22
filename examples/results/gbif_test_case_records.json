@@ -1,0 +1,65 @@
+{
+  "part1_search": {
+    "region": "HEALPix depth-8 cell 218409 (Madrid)",
+    "taxon": {
+      "query": "Ciconia ciconia",
+      "checklist_key": "7ddf754f-d193-4cc9-b351-99906754a03b",
+      "taxon_key": "5Z5T3",
+      "name": "Ciconia ciconia (Linnaeus, 1758)",
+      "rank": "SPECIES",
+      "match_type": "EXACT"
+    },
+    "provenance": {
+      "source": "GBIF occurrence search API",
+      "api": "https://api.gbif.org/v1/occurrence/search",
+      "params": {
+        "geometry": "POLYGON((-3.917187 40.109464,-3.465625 40.109464,-3.465625 40.600615,-3.917187 40.600615,-3.917187 40.109464))",
+        "hasCoordinate": "true",
+        "checklistKey": "7ddf754f-d193-4cc9-b351-99906754a03b",
+        "taxonKey": "5Z5T3",
+        "year": 2025
+      },
+      "checklist_key": "7ddf754f-d193-4cc9-b351-99906754a03b",
+      "matched_in_query_polygon": 127,
+      "kept_in_region": 65,
+      "retrieved_at": "2026-09-22T17:41:05+00:00",
+      "producer": "healpix-connector 0.0.1"
+    },
+    "records_in_region": 65,
+    "with_uncertainty": 58,
+    "footprint_cells_depth8": {
+      "median": 1.0,
+      "max": 13
+    },
+    "seconds": 0
+  },
+  "part2_download": {
+    "download": {
+      "key": "0008222-260519110011954",
+      "doi": "10.15468/dl.r8pcat",
+      "created": "2026-05-22T18:13:27.026+00:00",
+      "total_records": 1081615,
+      "format": "SIMPLE_CSV",
+      "checklist_key": "not specified in the download request"
+    },
+    "rows_read": 1081615,
+    "records_in_iberia": 1004035,
+    "cells_occupied_depth8": 1440,
+    "species": 472,
+    "uncertainty": {
+      "share_stated": 0.381,
+      "median_m_when_stated": 9.5,
+      "p90_m_when_stated": 26.5,
+      "share_stated_wider_than_half_a_depth8_cell": 0.0129,
+      "sample_share_footprint_spans_more_than_one_cell": 0.0288,
+      "sample_size": 5000
+    },
+    "time": {
+      "share_year_missing": 0.0039,
+      "share_in_1981_2010": 0.011,
+      "share_before_1981": 0.0064,
+      "share_after_2010": 0.9786,
+      "median_year": 2021.0
+    }
+  }
+}
