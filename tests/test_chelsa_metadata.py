@@ -50,3 +50,12 @@ def test_write_roundtrip_and_stac_item(tmp_path):
     assert item["properties"]["start_datetime"].startswith("1981")
     assert item["properties"]["sci:doi"] == "10.16904/envidat.228"
     assert item["assets"]["data"]["href"].endswith(".zarr")
+
+
+def test_all_model_variables_have_verified_units():
+    # Units as documented in CHELSA's file specification.
+    assert chelsa.BIO[4][1] == "degC" and chelsa.BIO[12][1] == "kg m-2"
+    assert set(chelsa.BIO) == {1, 4, 5, 6, 12, 15}
+    ds = chelsa.to_dataset(bin_to_cells(
+        np.full((60, 60), 800.0), np.arange(-3.9958, -3.5, RES), np.arange(40.9958, 40.5, -RES), 8, RES), 12)
+    assert ds["bio12"].attrs["units"] == "kg m-2"

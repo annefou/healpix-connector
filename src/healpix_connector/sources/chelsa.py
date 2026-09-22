@@ -28,9 +28,18 @@ SOURCE = {
     ),
 }
 
-# bio number -> (CF standard_name, units, long name)
+# bio number -> (CF standard_name, units, long name).
+# Units are those documented in CHELSA's own file specification (all six are
+# stored as uint16 with scale 0.1; temperatures also carry offset -273.15,
+# which read_window applies).
 BIO = {
-    1: ("air_temperature", "degC", "Mean annual near-surface air temperature (BIO1)"),
+    1: ("air_temperature", "degC", "Mean annual air temperature (BIO1)"),
+    4: ("air_temperature", "degC", "Temperature seasonality: standard deviation of monthly mean temperatures (BIO4)"),
+    5: ("air_temperature", "degC", "Mean daily maximum air temperature of the warmest month (BIO5)"),
+    6: ("air_temperature", "degC", "Mean daily minimum air temperature of the coldest month (BIO6)"),
+    12: ("precipitation_amount", "kg m-2", "Annual precipitation amount (BIO12)"),
+    # CHELSA documents bio15 as kg m-2, though it is a coefficient of variation.
+    15: ("precipitation_amount", "kg m-2", "Precipitation seasonality: coefficient of variation of monthly precipitation (BIO15)"),
 }
 
 RESAMPLING = "area-weighted binning of source pixel centres into WGS84 HEALPix cells"
