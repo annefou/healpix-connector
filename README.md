@@ -4,14 +4,14 @@ Connect existing data repositories to the [HEALPix](https://healpix.sourceforge.
 
 Every value it returns states its **support** (HEALPix depth), its **valid time** and its **uncertainty**, together with the identifiers needed to cite and reproduce it.
 
-> **Status: early development.** The CHELSA converter (`sources.chelsa`) and the GBIF connector (`connectors.gbif`) work; see `examples/`. Matching environmental values to records is next.
+> **Status: early development.** The CHELSA converter (`sources.chelsa`), the GBIF connector (`connectors.gbif`) and sampling with support, valid time and uncertainty (`sample`) work; see `examples/`. Next: rebuilding a published replication on top of them.
 
 ## What it will do
 
 - **Occurrence connectors.** Read records from GBIF, OBIS and the Living Atlases for a region (bounding box, polygon or HEALPix cells), and return each record with its cell, the cells its positional uncertainty covers, the download DOI and the taxonomy used. Records are read from the repository on request, never mirrored.
   - GBIF works today: name matching, region search and existing downloads. It always states the taxonomy (`checklistKey`), because GBIF.org now defaults to the Catalogue of Life while its API still defaults to the legacy backbone, and it retries when GBIF rate-limits or errors.
 - **Environmental sources.** Any dataset published as Zarr following [zarr-conventions/dggs](https://github.com/zarr-conventions/dggs) and described by a STAC item can be used as a source. First converter: CHELSA climatologies (~1 km).
-- **Matching.** Attach environmental values to records at declared depth, matched to each record's `eventDate`, with uncertainty reported as separate components.
+- **Matching.** Attach environmental values to records at a declared depth, with the record's date checked against the dataset's period, and uncertainty kept as separate components (the source's own spread inside the cell, and the spread across the cells the record's positional uncertainty covers). Depth differences are reconciled explicitly: a coarser source is *inherited*, a finer one *aggregated*, and the result says which.
 
 ## Design principles
 

@@ -1,0 +1,44 @@
+{
+  "provenance": {
+    "dataset": "CHELSA v2.1 bio1 on HEALPix depth 8",
+    "dataset_doi": "10.16904/envidat.228",
+    "license": "CC0-1.0",
+    "source_depth": 8,
+    "sampled_at_depth": 8,
+    "valid_time": "climatology",
+    "period": [
+      "1981-01-01",
+      "2010-12-31"
+    ],
+    "resampling_method": "area-weighted binning of source pixel centres into WGS84 HEALPix cells",
+    "producer": "healpix-connector 0.0.1"
+  },
+  "records": {
+    "in_iberia": 1004035,
+    "with_a_value": 1004035,
+    "cells_occupied": 1440
+  },
+  "time": {
+    "outside_the_climatology": 0.985,
+    "inside_the_climatology": 0.011,
+    "date_unknown": 0.0039
+  },
+  "uncertainty_source_within_cell_degC": {
+    "median": 0.261,
+    "p95": 1.428,
+    "max": 4.272
+  },
+  "uncertainty_positional_degC_sample": {
+    "n": 5000,
+    "share_nonzero": 0.034,
+    "median_when_nonzero": 0.941,
+    "max": 3.819
+  },
+  "record_weighted_test1_centre_vs_mean_degC": {
+    "median": 0.148,
+    "p95": 0.576,
+    "share_records_gt_0.5C": 0.0693,
+    "share_records_gt_1C": 0.0128,
+    "share_cells_gt_1C": 0.0847
+  }
+}
