@@ -24,7 +24,14 @@ authors:
   - name: "LifeWatch ERIC"
     website: "https://www.lifewatch.eu"
     alias: "https://ror.org/04c04g438"
-# A concept DOI is minted by Zenodo at the first GitHub release; add it here then.
+doi: "10.5281/zenodo.22904850"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.22904850"
+    description: "Concept DOI (resolves to the latest version)"
+  - type: doi
+    value: "10.5281/zenodo.22904851"
+    description: "Version DOI (v0.1.0)"
 keywords:
   - HEALPix
   - DGGS
