@@ -17,6 +17,13 @@ pytest = ">=8"
 [feature.test.tasks]
 test = "pytest -q"
 
+[feature.climatedt.pypi-dependencies]
+polytope-client = "*"
+
+[feature.climatedt.dependencies]
+cfgrib = "*"
+eccodes = "*"
+
 [feature.convert.dependencies]
 rasterio = ">=1.3"
 netcdf4 = ">=1.6"   # only to read/write the test case's predictor files
@@ -30,4 +37,5 @@ pandas = ">=2.1"
 
 [environments]
 test = ["test", "convert", "biodiversity"]
+climatedt = ["convert", "climatedt"]
 convert = ["convert"]

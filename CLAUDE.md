@@ -47,4 +47,14 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   2026-09-22: 0.5 s per page at offset 0, 0.4 s at 6,000, **361 s at 12,000**
   (394 s for the same query without geometry). Hence
   `gbif.PRACTICAL_PAGING_LIMIT = 5,000`; beyond that use a download.
+- Climate DT (DestinE, SSP3-7.0 via Polytope): **no monthly stream** (`clmn`, `mnth`
+  return 400); only hourly `clte`. Served for **2020-2039** only (2018 and 2040 are
+  refused). `tp` is an hourly accumulation, too large for decadal work; use param
+  **260048 `tprate`** (instantaneous rate, kg m-2 s-1). Date ranges and several
+  params in one request work (a month, 2 params, 2 times ~ 46 MB in seconds).
+  The GRIB is native `gridType=healpix, Nside=128, orderingConvention=nested`,
+  i.e. depth 7 **on a sphere** - look study cells up with `ellipsoid="sphere"`
+  rather than assuming ids match WGS84 ones.
+  Measured 2026-09-22.
+- The polytope client calls `sys.exit` on a refused request: catch `SystemExit`.
 - GBIF answers 429 to bursts; `_get` retries on 429 and 5xx, honouring `Retry-After`.

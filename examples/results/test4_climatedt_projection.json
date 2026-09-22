@@ -1,0 +1,37 @@
+{
+  "nside": 256,
+  "source_depth": 7,
+  "support": "Climate DT depth-7 cell (~51 km), wider than the study's ~25 km cell",
+  "periods": {
+    "2020-2029": {
+      "bio1": 16.29,
+      "bio4": 5.47,
+      "bio12": 559.18,
+      "bio15": 67.23
+    },
+    "2030-2039": {
+      "bio1": 16.43,
+      "bio4": 5.33,
+      "bio12": 584.82,
+      "bio15": 67.54
+    }
+  },
+  "change_2030_2039_minus_2020_2029": {
+    "bio1": {
+      "mean": 0.14,
+      "max_abs": 0.32
+    },
+    "bio4": {
+      "mean": -0.14,
+      "max_abs": 0.36
+    },
+    "bio12": {
+      "mean": 25.64,
+      "max_abs": 432.65
+    },
+    "bio15": {
+      "mean": 0.31,
+      "max_abs": 32.25
+    }
+  }
+}

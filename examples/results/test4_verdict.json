@@ -1,0 +1,89 @@
+{
+  "question": "Do the study's hotspots hold under a projected 2030s climate?",
+  "study": "annefou/sdm-hotspot-spatial-effort (museum strategy, nside 256 = depth 8)",
+  "source": {
+    "dataset": "DestinE Climate DT, IFS-NEMO, ScenarioMIP SSP3-7.0, generation 1, realization 1, stream clte",
+    "access": "Polytope (polytope.lumi.apps.dte.destination-earth.eu), collection destination-earth",
+    "grid": "native HEALPix nside 128 (depth 7, ~51 km), NESTED, on a sphere",
+    "params": {
+      "167": "2 m temperature",
+      "260048": "total precipitation rate (kg m-2 s-1, instantaneous)"
+    },
+    "sampling": "00 and 12 UTC each day, 240 months retrieved and discarded after aggregation"
+  },
+  "design": {
+    "why_two_decades": "a free-running projection cannot say what a given year was; comparing two decades of the same simulation isolates the climate change, not the weather",
+    "periods": [
+      "2020-2029",
+      "2030-2039"
+    ],
+    "cell_matching": "each WGS84 depth-8 study cell centre looked up in the spherical depth-7 Climate DT grid; support declared as the ~51 km source cell",
+    "covariates": [
+      "bio1",
+      "bio4",
+      "bio12",
+      "bio15"
+    ]
+  },
+  "climatology": {
+    "2020-2029": {
+      "bio1": 16.29,
+      "bio4": 5.47,
+      "bio12": 559.18,
+      "bio15": 67.23
+    },
+    "2030-2039": {
+      "bio1": 16.43,
+      "bio4": 5.33,
+      "bio12": 584.82,
+      "bio15": 67.54
+    }
+  },
+  "projected_change_2030s_minus_2020s": {
+    "bio1": {
+      "mean": 0.14,
+      "max_abs": 0.32
+    },
+    "bio4": {
+      "mean": -0.14,
+      "max_abs": 0.36
+    },
+    "bio12": {
+      "mean": 25.64,
+      "max_abs": 432.65
+    },
+    "bio15": {
+      "mean": 0.31,
+      "max_abs": 32.25
+    }
+  },
+  "misidentified_pct": {
+    "2020-2029": {
+      "raw": 93.71,
+      "sdm_target_group": 96.67,
+      "sdm_random": 98.91,
+      "reaches_reference_range": false
+    },
+    "2030-2039": {
+      "raw": 93.71,
+      "sdm_target_group": 95.51,
+      "sdm_random": 97.24,
+      "reaches_reference_range": false
+    }
+  },
+  "reference_range_pct": [
+    47.8,
+    68.6
+  ],
+  "effect_pp": {
+    "projected_climate_2020s_to_2030s": -1.16
+  },
+  "verdict": "unchanged: 96.67% (2020s) and 95.51% (2030s), both far outside the 47.8-68.6% reference range, so the Contradicted conclusion also holds under the projected climate",
+  "caveats": [
+    "Climate DT SSP3-7.0 is served for 2020-2039 only (2018 and 2040 are refused), so the decades are 10 years apart and the forced signal is small (+0.14 degC) relative to internal variability",
+    "precipitation is estimated from the instantaneous rate at 00 and 12 UTC, not from accumulated hourly totals; bio12 is 559-585 mm against 635 (ERA5) and 684 (CHELSA), and bio15 is high (67 against 47-51)",
+    "the support is a ~51 km source cell, twice the width of the study's cell",
+    "the 1.16 pp effect is of the same order as the 0.57 pp gap between our baseline and the published number",
+    "free-running projection: these years are plausible years, not observed ones (test 3 used ERA5 for the observed period)"
+  ]
+}

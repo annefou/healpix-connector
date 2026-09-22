@@ -1,7 +1,8 @@
-.pixi/
-__pycache__/
 *.egg-info/
+.pixi/
 .pytest_cache/
-dist/
+__pycache__/
 build/
 data/
+data/climatedt/
+dist/
