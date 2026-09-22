@@ -4,7 +4,9 @@ Connect existing data repositories to the [HEALPix](https://healpix.sourceforge.
 
 Every value it returns states its **support** (HEALPix depth), its **valid time** and its **uncertainty**, together with the identifiers needed to cite and reproduce it.
 
-> **Status: early development.** The CHELSA converter (`sources.chelsa`), the GBIF connector (`connectors.gbif`) and sampling with support, valid time and uncertainty (`sample`) work; see `examples/`. Next: rebuilding a published replication on top of them.
+> **Status: early development.** The CHELSA converter (`sources.chelsa`), the GBIF connector (`connectors.gbif`) and sampling with support, valid time and uncertainty (`sample`) work; see `examples/`.
+>
+> **First scientific test, done.** [sdm-hotspot-spatial-effort](https://github.com/annefou/sdm-hotspot-spatial-effort) was rerun with only its covariates replaced by declared-support cell means. Its *Contradicted* verdict survives: 96.67 % of hotspots misidentified with the study's cell-centre pixels, 96.09 % with cell means, against a 47.8-68.6 % reference range (`examples/results/test1_verdict.json`).
 
 ## What it will do
 

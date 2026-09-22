@@ -1,0 +1,91 @@
+{
+  "question": "Does declaring spatial support change the study's verdict?",
+  "study": "annefou/sdm-hotspot-spatial-effort (museum strategy, nside 256 = depth 8)",
+  "what_changed": "only the covariates: CHELSA sampled at each cell's centre pixel (study) vs the area-weighted mean over the whole cell (healpix-connector). Same records, same cells, same model, same seed.",
+  "determinism": "the analysis is seeded; repeating the baseline reproduced 96.67 / 97.24 exactly, so the differences below are attributable to the covariates",
+  "reference_range_pct": [
+    47.8,
+    68.6
+  ],
+  "misidentified_pct": {
+    "published_study": {
+      "raw": 93.71,
+      "sdm_target_group": 97.24,
+      "sdm_random": 93.71
+    },
+    "our_baseline_centre_pixel": {
+      "raw": 93.71,
+      "sdm_target_group": 96.67,
+      "sdm_random": 97.24
+    },
+    "cell_mean": {
+      "raw": 93.71,
+      "sdm_target_group": 96.09,
+      "sdm_random": 97.8
+    }
+  },
+  "verdict": {
+    "study_verdict": "Contradicted (target-group background does not restore hotspot identity)",
+    "survives_declared_support": true,
+    "target_group_shift_pp": -0.58,
+    "reaches_reference_range": {
+      "centre_pixel": false,
+      "cell_mean": false
+    }
+  },
+  "covariate_difference": {
+    "bio1": {
+      "cells": 1849,
+      "unit": "degC",
+      "median_abs_diff": 0.099,
+      "p95_abs_diff": 1.302,
+      "max_abs_diff": 4.312,
+      "median_within_cell_std": 0.329
+    },
+    "bio4": {
+      "cells": 1849,
+      "unit": "degC",
+      "median_abs_diff": 1.662,
+      "p95_abs_diff": 11.015,
+      "max_abs_diff": 43.724,
+      "median_within_cell_std": 7.227
+    },
+    "bio5": {
+      "cells": 1849,
+      "unit": "degC",
+      "median_abs_diff": 0.141,
+      "p95_abs_diff": 1.228,
+      "max_abs_diff": 4.599,
+      "median_within_cell_std": 0.519
+    },
+    "bio6": {
+      "cells": 1849,
+      "unit": "degC",
+      "median_abs_diff": 0.114,
+      "p95_abs_diff": 1.239,
+      "max_abs_diff": 4.345,
+      "median_within_cell_std": 0.426
+    },
+    "bio12": {
+      "cells": 1849,
+      "unit": "kg m-2",
+      "median_abs_diff": 11.07,
+      "p95_abs_diff": 108.402,
+      "max_abs_diff": 413.151,
+      "median_within_cell_std": 35.511
+    },
+    "bio15": {
+      "cells": 1849,
+      "unit": "kg m-2",
+      "median_abs_diff": 0.152,
+      "p95_abs_diff": 0.806,
+      "max_abs_diff": 2.041,
+      "median_within_cell_std": 0.846
+    }
+  },
+  "caveats": [
+    "museum strategy only; the all-observations download is 7 GB and was not run",
+    "one depth (nside 256); the study's full ladder was not rerun",
+    "our baseline gives 96.67 where the study published 97.24, a reproduction difference of 0.57 pp from data vintage and environment, of the same size as the effect measured here"
+  ]
+}
