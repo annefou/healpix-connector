@@ -21,9 +21,10 @@ API = "https://api.gbif.org/v1"
 COL_XR = "7ddf754f-d193-4cc9-b351-99906754a03b"  # Catalogue of Life eXtended Release
 LEGACY_BACKBONE = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"  # GBIF Backbone Taxonomy (last built 2023)
 SEARCH_LIMIT = 100_000  # GBIF refuses offset + limit beyond this (HTTP 400)
-# Deep paging with a geometry filter collapses: measured 2026-09-22 on one
-# depth-8 cell, a page took 0.5 s at offset 0 and 0.4 s at offset 6,000, but
-# 361 s at offset 12,000. Past a few thousand records, use a download.
+# Deep paging collapses, with or without a geometry filter. Measured 2026-09-22:
+# one page took 0.5 s at offset 0 and 0.4 s at offset 6,000, but 361 s at offset
+# 12,000 (394 s for the same query without geometry). Past a few thousand
+# records, use a download.
 PRACTICAL_PAGING_LIMIT = 5_000
 PAGE = 300  # maximum page size of the occurrence search API
 USER_AGENT = f"healpix-connector/{__version__} (+https://github.com/annefou/healpix-connector)"
@@ -107,9 +108,8 @@ def search(region: Region, *, checklist_key: str = COL_XR, taxon_key: str | None
     """Records in ``region`` via the search API, filtered exactly to the region.
 
     ``max_records`` bounds the work. It defaults to ``PRACTICAL_PAGING_LIMIT``,
-    well below the API's own ceiling, because deep paging with a geometry filter
-    becomes pathologically slow (see that constant). Raise it deliberately, or
-    use a download.
+    well below the API's own ceiling, because deep paging becomes pathologically
+    slow (see that constant). Raise it deliberately, or use a download.
     """
     import requests
 
@@ -125,10 +125,10 @@ def search(region: Region, *, checklist_key: str = COL_XR, taxon_key: str | None
     cap = min(int(max_records), SEARCH_LIMIT)
     if count > cap:
         raise TooManyRecords(
-            f"{count:,} records match; this call allows {cap:,}. Deep paging with a geometry "
-            f"filter is pathologically slow (~361 s per page at offset 12,000) and the API stops "
-            f"at {SEARCH_LIMIT:,} anyway. Narrow the region or filters, raise max_records "
-            "deliberately, or use a GBIF download (record-level, with a DOI).")
+            f"{count:,} records match; this call allows {cap:,}. Deep paging is pathologically "
+            f"slow (~361 s for one page at offset 12,000) and the API stops at {SEARCH_LIMIT:,} "
+            "anyway. Narrow the region or filters, raise max_records deliberately, or use a "
+            "GBIF download (record-level, with a DOI).")
     raw = []
     for offset in range(0, count, PAGE):
         if offset:

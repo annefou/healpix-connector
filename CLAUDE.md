@@ -43,7 +43,8 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 
 ## Measured limits (do not rediscover)
 
-- GBIF search + geometry filter: deep paging collapses. One depth-8 cell, 2026-09-22:
-  0.5 s per page at offset 0, 0.4 s at 6,000, **361 s at 12,000**. Hence
+- GBIF search: deep paging collapses, with or without a geometry filter. Measured
+  2026-09-22: 0.5 s per page at offset 0, 0.4 s at 6,000, **361 s at 12,000**
+  (394 s for the same query without geometry). Hence
   `gbif.PRACTICAL_PAGING_LIMIT = 5,000`; beyond that use a download.
 - GBIF answers 429 to bursts; `_get` retries on 429 and 5xx, honouring `Retry-After`.
