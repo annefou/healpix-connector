@@ -61,3 +61,13 @@ def test_all_model_variables_have_verified_units():
     ds = chelsa.to_dataset(bin_to_cells(
         np.full((60, 60), 800.0), np.arange(-3.9958, -3.5, RES), np.arange(40.9958, 40.5, -RES), 8, RES), 12)
     assert ds["bio12"].attrs["units"] == "kg m-2"
+
+
+def test_bio4_and_bio15_carry_the_corrected_units():
+    # Verified against CHELSA's own monthly layers, not against its specification:
+    # examples/results/chelsa_scaling_check.json.
+    from healpix_connector.sources import chelsa
+
+    assert chelsa.BIO[4][1] == "0.01 degC"          # published value is 100 x the sd
+    assert chelsa.BIO[15][1] == "percent"           # a coefficient of variation
+    assert chelsa.BIO[15][0] == ""                  # no CF standard name for a CV

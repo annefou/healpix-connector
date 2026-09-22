@@ -1,0 +1,31 @@
+{
+  "window_lon_lat": [
+    -6.0,
+    39.0,
+    -5.0,
+    40.0
+  ],
+  "source": "CHELSA v2.1 1981-2010 monthly tas and pr, and the published bio layers",
+  "bio4": {
+    "published": 669.77,
+    "recomputed_sd_population_degC": 6.698,
+    "recomputed_sd_sample_degC": 6.996,
+    "ratio_to_population_sd": 100.0,
+    "ratio_to_sample_sd": 95.74,
+    "documented": "degC, scale 0.1, offset 0 (file specification and GDAL tags)",
+    "actual": "100 x the population standard deviation, i.e. degC/100"
+  },
+  "bio12": {
+    "published": 691.2,
+    "recomputed_annual_sum": 691.2,
+    "ratio": 1.0,
+    "verdict": "matches; unit kg m-2 is right"
+  },
+  "bio15": {
+    "published": 56.89,
+    "recomputed_cv_percent": 56.89,
+    "ratio": 1.0,
+    "documented": "kg m-2 (file specification)",
+    "actual": "a coefficient of variation in percent; the value is right, the unit is not"
+  }
+}

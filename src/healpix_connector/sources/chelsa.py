@@ -34,15 +34,25 @@ SOURCE = {
 # which read_window applies).
 BIO = {
     1: ("air_temperature", "degC", "Mean annual air temperature (BIO1)"),
-    # CHELSA's specification lists bio4 as degC, but its values are 100x the
-    # standard deviation: CHELSA gives 495.75 where the same statistic computed
-    # from ERA5 monthly means over the same period and cells gives 4.96.
+    # CHELSA's file specification and the GeoTIFF's own GDAL tags both give bio4
+    # as degC with scale 0.1 and no offset. The published values are 100x the
+    # standard deviation, following WorldClim ("Temperature Seasonality (standard
+    # deviation x100)"), which neither the specification nor the file says.
+    # Checked against CHELSA's own monthly tas layers, 1981-2010, a 1-degree
+    # window at 39N 6W: bio4 / sd(12 monthly means, ddof=0) = 100.00 exactly
+    # (ddof=1 gives 95.74, so it is the population standard deviation).
+    # To read bio4 as degC, divide the published value by 100.
     4: ("air_temperature", "0.01 degC", "Temperature seasonality: 100 x standard deviation of monthly mean temperatures (BIO4)"),
     5: ("air_temperature", "degC", "Mean daily maximum air temperature of the warmest month (BIO5)"),
     6: ("air_temperature", "degC", "Mean daily minimum air temperature of the coldest month (BIO6)"),
     12: ("precipitation_amount", "kg m-2", "Annual precipitation amount (BIO12)"),
-    # CHELSA documents bio15 as kg m-2, though it is a coefficient of variation.
-    15: ("precipitation_amount", "kg m-2", "Precipitation seasonality: coefficient of variation of monthly precipitation (BIO15)"),
+    # CHELSA's specification gives bio15 as kg m-2, but it is a coefficient of
+    # variation: a percentage, not a precipitation amount, and there is no CF
+    # standard name for it. The value itself is right - recomputed from CHELSA's
+    # own monthly pr layers for the window above, 100*sd/mean = 56.89 against
+    # 56.89 published (ratio 1.000) - so only the unit is wrong. bio12 checks out
+    # exactly on the same window (sum of the 12 monthly layers = 691.2 = bio12).
+    15: ("", "percent", "Precipitation seasonality: coefficient of variation of monthly precipitation (BIO15)"),
 }
 
 RESAMPLING = "area-weighted binning of source pixel centres into WGS84 HEALPix cells"
@@ -67,7 +77,7 @@ def to_dataset(stats: CellStats, n: int):
 
     ds = xr.Dataset(
         {
-            var: ("cells", stats.mean, {"standard_name": std_name, "units": units,
+            var: ("cells", stats.mean, {**({"standard_name": std_name} if std_name else {}), "units": units,
                                         "long_name": long_name, "cell_methods": "cells: mean (area-weighted)",
                                         "grid_mapping": "crs"}),
             f"{var}_std": field(stats.std, "area-weighted standard deviation"),
