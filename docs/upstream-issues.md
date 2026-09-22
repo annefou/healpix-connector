@@ -110,7 +110,3 @@ Working code exists: it writes zarr-conventions/dggs v1 with the CF grid mapping
 STAC item, the same output shape as the existing converters, and needs rasterio
 (healpix-convert already depends on rasterix). Happy to open it as a PR, or to keep it
 downstream and follow whatever pattern you prefer.
-
-**One trap worth carrying upstream either way.** CHELSA's specification gives `bio4` in
-degC, but the published values are 100x the standard deviation: 495.75 against 4.96
-computed from ERA5 for the same cells and period.
