@@ -38,6 +38,13 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - Also to report: healpix-resample's `OverlapConservativeResampler` is sphere-only (geodetic
   `sin(lat)`, `ellipsoid="sphere"` hard-coded; its docstring says an authalic variant only
   changes the lat→z mapping). Ask for an `ellipsoid` option so its cell ids match WGS84.
+- `sources/climatedt.MonthConverter` → healpix-convert: `ClimateDTConverter` takes a single
+  date and builds its cache name from it, so a MARS date range (which Polytope accepts, and
+  which turns ~90,000 requests for a decade into 120) cannot be cached. Ask for a date range
+  plus a filename-safe cache tag; everything else there is used unchanged.
+- Also to report: `PSFResampler` has no non-negativity constraint, so on precipitation it
+  rings into negative values (114 of 480 Iberian cells, a January mean; `lam` up to 0.1 only
+  reduces it to 71). Worth a warning in its docstring, or a clipped/constrained variant.
 - Issues are drafted only when everything is in place (Anne, 2026-09-21). After the upstream
   PRs land, delete the local converter; the connector reads converted data through STAC.
 
@@ -57,4 +64,11 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   rather than assuming ids match WGS84 ones.
   Measured 2026-09-22.
 - The polytope client calls `sys.exit` on a refused request: catch `SystemExit`.
+- Climate DT is **not** ours to re-implement: the request, endpoint, conventions and the
+  sphere→WGS84 resampling come from healpix-convert (public, PyPI, byte-identical to the
+  private GRID4EARTH `legacy-converters`). `healpix_resample.NearestResampler(ellipsoid=
+  "WGS84")` - healpix-convert's declared resampler for these fields - reproduces a manual
+  spherical-cell lookup exactly (max diff 0 K), so use it rather than hand-rolled indexing.
+- healpix-convert pulls `torch`; the CUDA wheels do not fit on a normal working disk, so the
+  `climatedt` feature pins the CPU wheel via the PyTorch CPU index.
 - GBIF answers 429 to bursts; `_get` retries on 429 and 5xx, honouring `Retry-After`.

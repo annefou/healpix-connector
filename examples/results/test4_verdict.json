@@ -2,14 +2,28 @@
   "question": "Do the study's hotspots hold under a projected 2030s climate?",
   "study": "annefou/sdm-hotspot-spatial-effort (museum strategy, nside 256 = depth 8)",
   "source": {
-    "dataset": "DestinE Climate DT, IFS-NEMO, ScenarioMIP SSP3-7.0, generation 1, realization 1, stream clte",
-    "access": "Polytope (polytope.lumi.apps.dte.destination-earth.eu), collection destination-earth",
-    "grid": "native HEALPix nside 128 (depth 7, ~51 km), NESTED, on a sphere",
+    "name": "Climate DT (DestinE)",
+    "model": "IFS-NEMO",
+    "experiment": "SSP3-7.0",
+    "stream": "clte",
+    "type": "fc",
+    "resolution": "standard",
+    "access": "Polytope polytope.lumi.apps.dte.destination-earth.eu, collection destination-earth",
+    "grid": "HEALPix depth 7 (nside 128), NESTED, on a sphere",
+    "converter": "healpix-convert ClimateDTConverter"
+  },
+  "produced_by": {
+    "download_and_conventions": "healpix-convert ClimateDTConverter (GRID4EARTH, public on PyPI; byte-identical to the private legacy-converters)",
+    "sphere_to_wgs84": {
+      "method": "healpix_resample nearest resampler, sphere -> WGS84",
+      "why": "nearest is healpix-convert's declared resampler for these fields; its optional PSF correction is a deconvolution and drove 114 of 480 cells negative on precipitation, which a rate cannot be"
+    },
+    "added_here": "a month per request instead of a timestep, monthly aggregation, and the resampler restricted to the cells asked for",
     "params": {
       "167": "2 m temperature",
-      "260048": "total precipitation rate (kg m-2 s-1, instantaneous)"
+      "260048": "total precipitation rate (kg m-2 s-1)"
     },
-    "sampling": "00 and 12 UTC each day, 240 months retrieved and discarded after aggregation"
+    "sampling": "00 and 12 UTC each day; 240 months retrieved and discarded after aggregation"
   },
   "design": {
     "why_two_decades": "a free-running projection cannot say what a given year was; comparing two decades of the same simulation isolates the climate change, not the weather",
@@ -17,7 +31,7 @@
       "2020-2029",
       "2030-2039"
     ],
-    "cell_matching": "each WGS84 depth-8 study cell centre looked up in the spherical depth-7 Climate DT grid; support declared as the ~51 km source cell",
+    "support": "each depth-8 study cell inherits its depth-7 source cell (~51 km), twice its own width",
     "covariates": [
       "bio1",
       "bio4",
@@ -27,16 +41,16 @@
   },
   "climatology": {
     "2020-2029": {
-      "bio1": 16.29,
-      "bio4": 5.47,
-      "bio12": 559.18,
-      "bio15": 67.23
+      "bio1": 16.3,
+      "bio4": 5.49,
+      "bio12": 556.99,
+      "bio15": 67.35
     },
     "2030-2039": {
-      "bio1": 16.43,
-      "bio4": 5.33,
-      "bio12": 584.82,
-      "bio15": 67.54
+      "bio1": 16.44,
+      "bio4": 5.34,
+      "bio12": 582.77,
+      "bio15": 67.79
     }
   },
   "projected_change_2030s_minus_2020s": {
@@ -45,28 +59,28 @@
       "max_abs": 0.32
     },
     "bio4": {
-      "mean": -0.14,
+      "mean": -0.15,
       "max_abs": 0.36
     },
     "bio12": {
-      "mean": 25.64,
+      "mean": 26.04,
       "max_abs": 432.65
     },
     "bio15": {
-      "mean": 0.31,
+      "mean": 0.37,
       "max_abs": 32.25
     }
   },
   "misidentified_pct": {
     "2020-2029": {
       "raw": 93.71,
-      "sdm_target_group": 96.67,
+      "sdm_target_group": 95.51,
       "sdm_random": 98.91,
       "reaches_reference_range": false
     },
     "2030-2039": {
       "raw": 93.71,
-      "sdm_target_group": 95.51,
+      "sdm_target_group": 94.92,
       "sdm_random": 97.24,
       "reaches_reference_range": false
     }
@@ -76,14 +90,15 @@
     68.6
   ],
   "effect_pp": {
-    "projected_climate_2020s_to_2030s": -1.16
+    "projected_climate_2020s_to_2030s": -0.59
   },
-  "verdict": "unchanged: 96.67% (2020s) and 95.51% (2030s), both far outside the 47.8-68.6% reference range, so the Contradicted conclusion also holds under the projected climate",
+  "verdict": "unchanged: 95.51% (2020s) and 94.92% (2030s), both far outside the 47.8-68.6% reference range, so the Contradicted conclusion also holds under the projected climate",
   "caveats": [
-    "Climate DT SSP3-7.0 is served for 2020-2039 only (2018 and 2040 are refused), so the decades are 10 years apart and the forced signal is small (+0.14 degC) relative to internal variability",
-    "precipitation is estimated from the instantaneous rate at 00 and 12 UTC, not from accumulated hourly totals; bio12 is 559-585 mm against 635 (ERA5) and 684 (CHELSA), and bio15 is high (67 against 47-51)",
+    "Climate DT SSP3-7.0 is served for 2020-2039 only (2018 and 2040 are refused), so the decades are 10 years apart and the forced signal is small (+0.14 degC) against internal variability",
+    "precipitation is estimated from the instantaneous rate at 00 and 12 UTC, not accumulated hourly totals; bio12 is 557-583 mm against 635 (ERA5) and 684 (CHELSA)",
     "the support is a ~51 km source cell, twice the width of the study's cell",
-    "the 1.16 pp effect is of the same order as the 0.57 pp gap between our baseline and the published number",
-    "free-running projection: these years are plausible years, not observed ones (test 3 used ERA5 for the observed period)"
+    "the -0.59 pp effect is of the same order as the 0.57 pp gap between our baseline and the published number",
+    "free-running projection: these years are plausible years, not observed ones (test 3 used ERA5 for the observed period)",
+    "healpix-convert's optional PSF correction was tried and rejected for this: being a deconvolution it drove 114 of 480 cells to negative precipitation and monthly totals as low as -193 mm, so the nearest resampler its settings declare is used instead"
   ]
 }

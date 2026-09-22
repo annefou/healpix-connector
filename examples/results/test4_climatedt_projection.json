@@ -1,20 +1,35 @@
 {
   "nside": 256,
   "source_depth": 7,
-  "support": "Climate DT depth-7 cell (~51 km), wider than the study's ~25 km cell",
+  "source": {
+    "name": "Climate DT (DestinE)",
+    "model": "IFS-NEMO",
+    "experiment": "SSP3-7.0",
+    "stream": "clte",
+    "type": "fc",
+    "resolution": "standard",
+    "access": "Polytope polytope.lumi.apps.dte.destination-earth.eu, collection destination-earth",
+    "grid": "HEALPix depth 7 (nside 128), NESTED, on a sphere",
+    "converter": "healpix-convert ClimateDTConverter"
+  },
+  "sampling": "inherited from depth 7",
   "periods": {
     "2020-2029": {
-      "bio1": 16.29,
-      "bio4": 5.47,
-      "bio12": 559.18,
-      "bio15": 67.23
+      "bio1": 16.3,
+      "bio4": 5.49,
+      "bio12": 556.99,
+      "bio15": 67.35
     },
     "2030-2039": {
-      "bio1": 16.43,
-      "bio4": 5.33,
-      "bio12": 584.82,
-      "bio15": 67.54
+      "bio1": 16.44,
+      "bio4": 5.34,
+      "bio12": 582.77,
+      "bio15": 67.79
     }
+  },
+  "ellipsoid_correction": {
+    "method": "healpix_resample nearest resampler, sphere -> WGS84",
+    "why": "nearest is healpix-convert's declared resampler for these fields; its optional PSF correction is a deconvolution and drove 114 of 480 cells negative on precipitation, which a rate cannot be"
   },
   "change_2030_2039_minus_2020_2029": {
     "bio1": {
@@ -22,15 +37,15 @@
       "max_abs": 0.32
     },
     "bio4": {
-      "mean": -0.14,
+      "mean": -0.15,
       "max_abs": 0.36
     },
     "bio12": {
-      "mean": 25.64,
+      "mean": 26.04,
       "max_abs": 432.65
     },
     "bio15": {
-      "mean": 0.31,
+      "mean": 0.37,
       "max_abs": 32.25
     }
   }

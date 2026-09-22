@@ -19,6 +19,12 @@ test = "pytest -q"
 
 [feature.climatedt.pypi-dependencies]
 polytope-client = "*"
+# GRID4EARTH's own Climate DT converter: request definition, HEALPix conventions
+# and the sphere -> WGS84 correction all come from there, not from us.
+healpix-convert = ">=2026.9"
+# healpix-convert asks for torch (healpix-resample uses it); the CPU wheel is
+# enough here and the CUDA one does not fit on a normal working disk.
+torch = { version = ">=2.9.1", index = "https://download.pytorch.org/whl/cpu" }
 
 [feature.climatedt.dependencies]
 cfgrib = "*"
@@ -37,5 +43,5 @@ pandas = ">=2.1"
 
 [environments]
 test = ["test", "convert", "biodiversity"]
-climatedt = ["convert", "climatedt"]
+climatedt = ["convert", "climatedt", "test"]
 convert = ["convert"]
