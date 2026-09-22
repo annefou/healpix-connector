@@ -34,7 +34,10 @@ SOURCE = {
 # which read_window applies).
 BIO = {
     1: ("air_temperature", "degC", "Mean annual air temperature (BIO1)"),
-    4: ("air_temperature", "degC", "Temperature seasonality: standard deviation of monthly mean temperatures (BIO4)"),
+    # CHELSA's specification lists bio4 as degC, but its values are 100x the
+    # standard deviation: CHELSA gives 495.75 where the same statistic computed
+    # from ERA5 monthly means over the same period and cells gives 4.96.
+    4: ("air_temperature", "0.01 degC", "Temperature seasonality: 100 x standard deviation of monthly mean temperatures (BIO4)"),
     5: ("air_temperature", "degC", "Mean daily maximum air temperature of the warmest month (BIO5)"),
     6: ("air_temperature", "degC", "Mean daily minimum air temperature of the coldest month (BIO6)"),
     12: ("precipitation_amount", "kg m-2", "Annual precipitation amount (BIO12)"),

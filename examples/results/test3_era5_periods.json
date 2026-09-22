@@ -1,0 +1,86 @@
+{
+  "nside": 256,
+  "depth": 8,
+  "periods": {
+    "1981-2010": {
+      "support_m": 24419,
+      "cell_width_m": 25467,
+      "method": "value of the source grid box containing the cell centre (~24 km)",
+      "per_variable": {
+        "bio1": {
+          "median_abs_diff_vs_chelsa": 0.19,
+          "p95": 1.83,
+          "mean_era5": 15.42,
+          "mean_chelsa": 15.44
+        },
+        "bio4": {
+          "median_abs_diff_vs_chelsa": 495.64,
+          "p95": 695.41,
+          "mean_era5": 4.96,
+          "mean_chelsa": 495.75
+        },
+        "bio12": {
+          "median_abs_diff_vs_chelsa": 66.52,
+          "p95": 285.61,
+          "mean_era5": 634.56,
+          "mean_chelsa": 683.91
+        },
+        "bio15": {
+          "median_abs_diff_vs_chelsa": 4.25,
+          "p95": 12.42,
+          "mean_era5": 46.65,
+          "mean_chelsa": 51.05
+        }
+      }
+    },
+    "2011-2025": {
+      "support_m": 24419,
+      "cell_width_m": 25467,
+      "method": "value of the source grid box containing the cell centre (~24 km)",
+      "per_variable": {
+        "bio1": {
+          "median_abs_diff_vs_chelsa": 0.67,
+          "p95": 2.38,
+          "mean_era5": 16.16,
+          "mean_chelsa": 15.44
+        },
+        "bio4": {
+          "median_abs_diff_vs_chelsa": 495.6,
+          "p95": 694.98,
+          "mean_era5": 5.11,
+          "mean_chelsa": 495.75
+        },
+        "bio12": {
+          "median_abs_diff_vs_chelsa": 72.88,
+          "p95": 274.65,
+          "mean_era5": 627.02,
+          "mean_chelsa": 683.91
+        },
+        "bio15": {
+          "median_abs_diff_vs_chelsa": 3.6,
+          "p95": 10.89,
+          "mean_era5": 51.49,
+          "mean_chelsa": 51.05
+        }
+      }
+    }
+  },
+  "time_effect_2011_2025_minus_1981_2010": {
+    "bio1": {
+      "mean_change": 0.74,
+      "max_abs_change": 1.33
+    },
+    "bio4": {
+      "mean_change": 0.15,
+      "max_abs_change": 0.59
+    },
+    "bio12": {
+      "mean_change": -7.54,
+      "max_abs_change": 130.66
+    },
+    "bio15": {
+      "mean_change": 4.84,
+      "max_abs_change": 17.25
+    }
+  }
+}

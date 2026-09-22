@@ -53,8 +53,10 @@ def test_write_roundtrip_and_stac_item(tmp_path):
 
 
 def test_all_model_variables_have_verified_units():
-    # Units as documented in CHELSA's file specification.
-    assert chelsa.BIO[4][1] == "degC" and chelsa.BIO[12][1] == "kg m-2"
+    # Units as documented in CHELSA's file specification, except bio4: its
+    # values are 100x the standard deviation (checked against ERA5).
+    assert chelsa.BIO[4][1] == "0.01 degC" and chelsa.BIO[12][1] == "kg m-2"
+    assert "100 x standard deviation" in chelsa.BIO[4][2]
     assert set(chelsa.BIO) == {1, 4, 5, 6, 12, 15}
     ds = chelsa.to_dataset(bin_to_cells(
         np.full((60, 60), 800.0), np.arange(-3.9958, -3.5, RES), np.arange(40.9958, 40.5, -RES), 8, RES), 12)

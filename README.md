@@ -6,7 +6,7 @@ Every value it returns states its **support** (HEALPix depth), its **valid time*
 
 > **Status: early development.** The CHELSA converter (`sources.chelsa`), the GBIF connector (`connectors.gbif`) and sampling with support, valid time and uncertainty (`sample`) work; see `examples/`.
 >
-> **First scientific test, done.** [sdm-hotspot-spatial-effort](https://github.com/annefou/sdm-hotspot-spatial-effort) was rerun with only its covariates replaced by declared-support cell means. Its *Contradicted* verdict survives: 96.67 % of hotspots misidentified with the study's cell-centre pixels, 96.09 % with cell means, against a 47.8-68.6 % reference range (`examples/results/test1_verdict.json`).
+> **First scientific tests, done.** [sdm-hotspot-spatial-effort](https://github.com/annefou/sdm-hotspot-spatial-effort) was rerun with only its covariates changed, three ways: declared-support cell means (test 1), and covariates from the records' own period rather than a 1981-2010 climatology (test 3). Its *Contradicted* verdict survives all of them; misidentification moves between 94.3 % and 96.7 %, against a 47.8-68.6 % reference range. See `examples/results/test1_verdict.json` and `test3_verdict.json`.
 
 ## What it will do
 

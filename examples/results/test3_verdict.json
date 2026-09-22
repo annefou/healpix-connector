@@ -1,0 +1,101 @@
+{
+  "question": "Does using covariates from the records' own period change the study's verdict?",
+  "study": "annefou/sdm-hotspot-spatial-effort (museum strategy, nside 256 = depth 8)",
+  "why": "98.5% of the records postdate CHELSA's 1981-2010 climatology (median year 2021)",
+  "design": {
+    "covariates": [
+      "bio1",
+      "bio4",
+      "bio12",
+      "bio15"
+    ],
+    "why_four": "ERA5 monthly means carry no daily max/min temperature, so bio5 and bio6 cannot be built faithfully from them; the CHELSA baseline was rerun with the same four so only dataset and period differ",
+    "runs": {
+      "chelsa4": "CHELSA 1981-2010 (~1 km), the study's own data",
+      "era5_1981-2010": "ERA5 (~24 km box) over the same period: isolates dataset and support",
+      "era5_2011-2025": "ERA5 over the records' period: the time effect"
+    },
+    "why_not_climate_dt": "Climate DT is a free-running projection under SSP3-7.0; its 2021 is a plausible 2021, not the observed one. ERA5 assimilates observations."
+  },
+  "misidentified_pct": {
+    "chelsa4": {
+      "raw": 93.71,
+      "sdm_target_group": 96.67,
+      "sdm_random": 97.8,
+      "reaches_reference_range": false
+    },
+    "era5_1981-2010": {
+      "raw": 93.71,
+      "sdm_target_group": 94.32,
+      "sdm_random": 97.24,
+      "reaches_reference_range": false
+    },
+    "era5_2011-2025": {
+      "raw": 93.71,
+      "sdm_target_group": 95.51,
+      "sdm_random": 97.24,
+      "reaches_reference_range": false
+    }
+  },
+  "reference_range_pct": [
+    47.8,
+    68.6
+  ],
+  "effects_pp": {
+    "dataset_and_support_chelsa_to_era5_same_period": -2.35,
+    "time_era5_1981_2010_to_2011_2025": 1.19,
+    "support_only_centre_vs_cell_mean_from_test1": -0.58,
+    "reproduction_gap_our_baseline_vs_published": -0.57
+  },
+  "climate_change_signal_between_periods": {
+    "bio1": {
+      "mean_change": 0.74,
+      "max_abs_change": 1.33
+    },
+    "bio4": {
+      "mean_change": 0.15,
+      "max_abs_change": 0.59
+    },
+    "bio12": {
+      "mean_change": -7.54,
+      "max_abs_change": 130.66
+    },
+    "bio15": {
+      "mean_change": 4.84,
+      "max_abs_change": 17.25
+    }
+  },
+  "era5_vs_chelsa_same_period": {
+    "bio1": {
+      "median_abs_diff_vs_chelsa": 0.19,
+      "p95": 1.83,
+      "mean_era5": 15.42,
+      "mean_chelsa": 15.44
+    },
+    "bio4": {
+      "median_abs_diff_vs_chelsa": 495.64,
+      "p95": 695.41,
+      "mean_era5": 4.96,
+      "mean_chelsa": 495.75
+    },
+    "bio12": {
+      "median_abs_diff_vs_chelsa": 66.52,
+      "p95": 285.61,
+      "mean_era5": 634.56,
+      "mean_chelsa": 683.91
+    },
+    "bio15": {
+      "median_abs_diff_vs_chelsa": 4.25,
+      "p95": 12.42,
+      "mean_era5": 46.65,
+      "mean_chelsa": 51.05
+    }
+  },
+  "support_note": "value of the source grid box containing the cell centre (~24 km)",
+  "verdict": "unchanged: every run stays far outside the 47.8-68.6% reference range, so the study's Contradicted conclusion is robust to covariate support, dataset and period",
+  "caveats": [
+    "museum strategy only, one depth (nside 256), four covariates",
+    "the effects measured (0.6 to 2.4 pp) are of the same order as the 0.57 pp reproduction gap between our baseline and the published number",
+    "closing the gap to the reference range would need about 28 pp"
+  ]
+}
