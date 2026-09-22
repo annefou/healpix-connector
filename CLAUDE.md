@@ -35,9 +35,6 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - `sources/chelsa.py` (and a future WorldClim converter) → healpix-convert, beside ERA5,
   Climate DT and CAMS. Its converters handle non-Zarr inputs (ERA5 downloads GRIB) and it
   already depends on rasterix.
-- Also to report: healpix-resample's `OverlapConservativeResampler` is sphere-only (geodetic
-  `sin(lat)`, `ellipsoid="sphere"` hard-coded; its docstring says an authalic variant only
-  changes the lat→z mapping). Ask for an `ellipsoid` option so its cell ids match WGS84.
 - `sources/climatedt.MonthConverter` → healpix-convert: `ClimateDTConverter` takes a single
   date and builds its cache name from it, so a MARS date range (which Polytope accepts, and
   which turns ~90,000 requests for a decade into 120) cannot be cached. Ask for a date range
@@ -45,7 +42,7 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - Also to report: `PSFResampler` has no non-negativity constraint, so on precipitation it
   rings into negative values (114 of 480 Iberian cells, a January mean; `lam` up to 0.1 only
   reduces it to 71). Worth a warning in its docstring, or a clipped/constrained variant.
-- Issues are drafted only when everything is in place (Anne, 2026-09-21). After the upstream
+- Drafted in `docs/upstream-issues.md` (2026-09-22), not filed until Anne has read them. After the upstream
   PRs land, delete the local converter; the connector reads converted data through STAC.
 
 ## Measured limits (do not rediscover)
