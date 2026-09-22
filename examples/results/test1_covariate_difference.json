@@ -1,0 +1,54 @@
+{
+  "nside": 256,
+  "depth": 8,
+  "per_variable": {
+    "bio1": {
+      "cells": 1849,
+      "unit": "degC",
+      "median_abs_diff": 0.099,
+      "p95_abs_diff": 1.302,
+      "max_abs_diff": 4.312,
+      "median_within_cell_std": 0.329
+    },
+    "bio4": {
+      "cells": 1849,
+      "unit": "degC",
+      "median_abs_diff": 1.662,
+      "p95_abs_diff": 11.015,
+      "max_abs_diff": 43.724,
+      "median_within_cell_std": 7.227
+    },
+    "bio5": {
+      "cells": 1849,
+      "unit": "degC",
+      "median_abs_diff": 0.141,
+      "p95_abs_diff": 1.228,
+      "max_abs_diff": 4.599,
+      "median_within_cell_std": 0.519
+    },
+    "bio6": {
+      "cells": 1849,
+      "unit": "degC",
+      "median_abs_diff": 0.114,
+      "p95_abs_diff": 1.239,
+      "max_abs_diff": 4.345,
+      "median_within_cell_std": 0.426
+    },
+    "bio12": {
+      "cells": 1849,
+      "unit": "kg m-2",
+      "median_abs_diff": 11.07,
+      "p95_abs_diff": 108.402,
+      "max_abs_diff": 413.151,
+      "median_within_cell_std": 35.511
+    },
+    "bio15": {
+      "cells": 1849,
+      "unit": "kg m-2",
+      "median_abs_diff": 0.152,
+      "p95_abs_diff": 0.806,
+      "max_abs_diff": 2.041,
+      "median_within_cell_std": 0.846
+    }
+  }
+}
