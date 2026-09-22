@@ -4,6 +4,12 @@ Everything here is measured from healpix-connector's own use. Nothing is filed
 until Anne has read it. Checked against `main` on 2026-09-22 (healpix-resample
 `2026.7.0` installed, `main` newer; healpix-convert `2026.9.0`).
 
+**Landscape, checked 2026-09-22.** healpix-resample: 5 open PRs (4 dependabot, #57
+notebooks env), 5 open issues, none covering these; #27 is about resampler parameter
+naming and #5 (user-defined output cell ids) is closed. healpix-convert: 1 open issue
+(#9, licence links) and 7 open PRs, 6 of them ours from 2026-09-07, still unreviewed —
+so file issues there before adding more code.
+
 ---
 
 ## 1. healpix-resample — `GroupByResampler`: `std`/`var` reductions, and cell counts
@@ -21,10 +27,22 @@ Measured use: CHELSA v2.1 (~1 km) onto depth 8 over Iberia, 1,849 cells; the wit
 standard deviation of annual precipitation reaches 413 kg m-2, i.e. the same order as
 the differences the science argues about.
 
-Related: `ConservativeResampler` already takes per-sample `area` and forwards
-`ellipsoid`, so area weighting is covered — but it rejects `out_cell_ids`, so it cannot
-answer "these cells, please". (My earlier note that the conservative resampler was
-sphere-only was wrong; `ellipsoid` is forwarded to `KNeighborsResampler`.)
+Related, and worth keeping apart: `ConservativeResampler` (PR #45) takes per-sample
+`area` and forwards `ellipsoid`, so area weighting is covered there — but it rejects
+`out_cell_ids`, so it cannot answer "these cells, please".
+
+## 1b. healpix-resample — `OverlapConservativeResampler` is spherical only
+
+`overlap_conservative.py` (PR #62, merged 2026-09-11, not yet in the released
+`2026.7.0`) hard-codes `ellipsoid="sphere"` (line 398) and says so: "the current
+implementation is **spherical** ... an authalic-ellipsoid variant would only change
+the lat -> z mapping".
+
+That makes its cell ids a different grid from every other resampler's, which default to
+WGS84. GRID4EARTH's own convention is WGS84, so overlap-conservative output cannot be
+matched to it without a silent shift — ~20 km at depth 7, about 40 % of a cell.
+
+Ask: an `ellipsoid` option, as the docstring already anticipates.
 
 ## 2. healpix-resample — `PSFResampler` has no non-negativity constraint
 
