@@ -32,6 +32,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.22904851"
     description: "Version DOI (v0.1.0)"
+  - type: doi
+    value: "10.5281/zenodo.23603498"
+    description: "Version DOI (v0.2.0)"
 keywords:
   - HEALPix
   - DGGS

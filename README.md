@@ -32,7 +32,7 @@ pixi run -e test test
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22904850.svg)](https://doi.org/10.5281/zenodo.22904850)
 
-Cite the concept DOI [10.5281/zenodo.22904850](https://doi.org/10.5281/zenodo.22904850) for the software, or the version DOI of the release you used ([10.5281/zenodo.22904851](https://doi.org/10.5281/zenodo.22904851) for v0.1.0). Metadata comes from `CITATION.cff`.
+Cite the concept DOI [10.5281/zenodo.22904850](https://doi.org/10.5281/zenodo.22904850) for the software, or the version DOI of the release you used ([10.5281/zenodo.22904851](https://doi.org/10.5281/zenodo.22904851) for v0.1.0, [10.5281/zenodo.23603498](https://doi.org/10.5281/zenodo.23603498) for v0.2.0). Metadata comes from `CITATION.cff`.
 
 ## Credits
 
