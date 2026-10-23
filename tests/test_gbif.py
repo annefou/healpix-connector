@@ -109,3 +109,13 @@ def test_rate_limit_and_server_errors_are_retried_honouring_retry_after():
     waits = []
     assert gbif._get(S(), "u", sleep=waits.append) == {"ok": 1}
     assert waits == [7, 2]  # Retry-After wins over the 1 s backoff; then 2 s
+
+
+def test_normalise_keeps_country_issues_year_and_occurrence_status():
+    rec = {**FIX, "countryCode": "TR", "year": 2019, "occurrenceStatus": "ABSENT",
+           "issues": ["COORDINATE_ROUNDED", "COUNTRY_COORDINATE_MISMATCH"]}
+    out = gbif.normalise(rec, gbif.COL_XR)
+    assert out["countryCode"] == "TR" and out["year"] == 2019
+    assert out["occurrenceStatus"] == "ABSENT"          # absences must never be read as presences
+    assert out["issues"] == ["COORDINATE_ROUNDED", "COUNTRY_COORDINATE_MISMATCH"]
+    assert gbif.normalise(FIX, gbif.COL_XR)["issues"] == []   # absent in the record -> empty list
