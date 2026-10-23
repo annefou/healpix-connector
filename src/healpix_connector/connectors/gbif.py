@@ -63,7 +63,9 @@ def _get(session, url, params=None, retries=6, sleep=time.sleep):
 
 
 def normalise(rec: dict, checklist_key: str) -> dict:
-    """Flatten one search-API record, keeping identity, position, time and taxonomy."""
+    """Flatten one search-API record, keeping identity, position, time, taxonomy and the
+    fields filters need: country, GBIF's own issue flags (passed through, not acted on)
+    and ``occurrenceStatus``, so that absence records are never read as presences."""
     cls = (rec.get("classifications") or {}).get(checklist_key) or {}
     usage, accepted = cls.get("usage") or {}, cls.get("acceptedUsage") or {}
     return {
@@ -74,6 +76,10 @@ def normalise(rec: dict, checklist_key: str) -> dict:
         "decimalLongitude": rec.get("decimalLongitude"),
         "decimalLatitude": rec.get("decimalLatitude"),
         "coordinateUncertaintyInMeters": rec.get("coordinateUncertaintyInMeters"),
+        "countryCode": rec.get("countryCode"),
+        "year": rec.get("year"),
+        "occurrenceStatus": rec.get("occurrenceStatus"),
+        "issues": list(rec.get("issues") or []),
         "basisOfRecord": rec.get("basisOfRecord"),
         "license": rec.get("license"),
         "taxon_key": usage.get("key"),
