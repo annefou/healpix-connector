@@ -1,0 +1,26 @@
+{
+  "description": "What the DestinE Climate DT generation 2 monthly stream offered when last measured. Facts about an external service: update this file (and 'measured'), not the code.",
+  "measured": "2026-10-23",
+  "measured_with": "IFS-FESOM (LUMI) and IFS-NEMO (MareNostrum 5), resolution high and standard, years 1991-2040",
+  "to_move_upstream": "healpix-convert settings/climatedt.py describes generation 1 (stream clte, depth 7, 2020-2039); this belongs there once it covers generation 2",
+  "endpoints": {
+    "IFS-NEMO": "polytope.mn5.apps.dte.destination-earth.eu",
+    "IFS-FESOM": "polytope.lumi.apps.dte.destination-earth.eu"
+  },
+  "collection": "destination-earth",
+  "request": {"class": "d1", "dataset": "climate-dt", "type": "fc", "expver": "0001", "generation": "2",
+              "realization": "1", "levtype": "sfc", "stream": "clmn"},
+  "experiments": [
+    {"activity": "baseline", "experiment": "hist", "years": [1990, 2014]},
+    {"activity": "projections", "experiment": "SSP3-7.0", "years": [2015, 2049]}
+  ],
+  "resolutions": {"high": 10, "standard": 7},
+  "grid": "HEALPix NESTED on a sphere (GRIB gridType healpix, orderingConvention nested)",
+  "params": {
+    "avg_2t": {"id": "228004", "units": "K", "name": "Time-mean 2 metre temperature"},
+    "avg_tprate": {"id": "235055", "units": "kg m-2 s-1", "name": "Time-mean total precipitation rate"},
+    "avg_2d": {"id": "235168", "units": "K", "name": "Time-mean 2 metre dewpoint temperature"}
+  },
+  "not_available": ["monthly maximum or minimum 2 m temperature (mx2t24, mn2t24): the short names resolve to other fields (mx2t24 returned avg_snswrfcs, 235051)"],
+  "transfer": {"months_per_request": 6, "note": "MareNostrum 5 drops transfers of about 500 MB; one parameter and half a year per request is about 145 MB at depth 10"}
+}

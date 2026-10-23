@@ -56,7 +56,7 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   2026-09-22: 0.5 s per page at offset 0, 0.4 s at 6,000, **361 s at 12,000**
   (394 s for the same query without geometry). Hence
   `gbif.PRACTICAL_PAGING_LIMIT = 5,000`; beyond that use a download.
-- Climate DT (DestinE, SSP3-7.0 via Polytope): **no monthly stream** (`clmn`, `mnth`
+- Climate DT **generation 1** (what healpix-convert requests): **no monthly stream** (`clmn`, `mnth`
   return 400); only hourly `clte`. Served for **2020-2039** only (2018 and 2040 are
   refused). `tp` is an hourly accumulation, too large for decadal work; use param
   **260048 `tprate`** (instantaneous rate, kg m-2 s-1). Date ranges and several
@@ -65,6 +65,16 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   i.e. depth 7 **on a sphere** - look study cells up with `ellipsoid="sphere"`
   rather than assuming ids match WGS84 ones.
   Measured 2026-09-22.
+- Climate DT **generation 2** (measured 2026-10-23, IFS-FESOM on LUMI, IFS-NEMO on MareNostrum 5):
+  monthly stream `clmn` exists at `high` (depth 10) and `standard` (depth 7), hist 1990-2014 and
+  SSP3-7.0 2015-2049; it has `avg_2t`, `avg_tprate`, `avg_2d` but **no monthly max/min temperature**,
+  and **short names can resolve to other fields** (`mx2t24` returned `avg_snswrfcs`): request by
+  numeric id and check `paramId` of every message. MareNostrum 5 drops ~500 MB transfers; ask for
+  one parameter and half a year. Source: `sources/climatedt_monthly.py`; the service facts are in
+  `sources/climatedt_gen2.json` (update that file, not the code).
+- Sphere -> WGS84 for same-size grids: `resampling.BilinearConservative` (healpix-resample bilinear,
+  conservative mode, normalised) differs from an exact polygon overlap by 0.07 degC on average at
+  depth 10; taking the same id instead is off by 0.80 degC (6.7 at the 99th percentile). Never PSF.
 - CHELSA's published bio layers, checked against its **own** monthly layers (a 1-degree
   window at 39N 6W, `examples/verify_chelsa_scaling.py`): `bio4` = **100 x the population
   standard deviation** (ratio 100.00; ddof=1 gives 95.74), which is WorldClim's convention

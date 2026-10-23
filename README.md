@@ -4,7 +4,7 @@ Connect existing data repositories to the [HEALPix](https://healpix.sourceforge.
 
 Every value it returns states its **support** (HEALPix depth), its **valid time** and its **uncertainty**, together with the identifiers needed to cite and reproduce it.
 
-> **Status: early development.** The CHELSA converter (`sources.chelsa`), the Climate DT source (`sources.climatedt`), the GBIF and OBIS connectors (`connectors.gbif`, `connectors.obis`) and sampling with support, valid time and uncertainty (`sample`) work; see `examples/`.
+> **Status: early development.** The CHELSA converter (`sources.chelsa`), the Climate DT sources (`sources.climatedt`, generation 1 hourly; `sources.climatedt_monthly`, generation 2 monthly means at depth 10, added 2026-10-23), the GBIF and OBIS connectors (`connectors.gbif`, `connectors.obis`) and sampling with support, valid time and uncertainty (`sample`) work; see `examples/`.
 >
 > **First scientific tests, done.** [sdm-hotspot-spatial-effort](https://github.com/annefou/sdm-hotspot-spatial-effort) was rerun four times with only its covariates changed: as declared-support cell means instead of centre pixels (test 1), from ERA5 for the records' own period instead of a 1981-2010 climatology (test 3), and from a Climate DT projection, one decade against another (test 4). Its *Contradicted* verdict survives all of them; misidentification moves between 94.3 % and 96.7 %, against a 47.8-68.6 % reference range, and every effect measured is the size of the 0.57 pp gap between our baseline and the published number. See `examples/results/test1_verdict.json`, `test3_verdict.json` and `test4_verdict.json`.
 >

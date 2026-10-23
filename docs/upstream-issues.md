@@ -115,3 +115,23 @@ Working code exists: it writes zarr-conventions/dggs v1 with the CF grid mapping
 STAC item, the same output shape as the existing converters, and needs rasterio
 (healpix-convert already depends on rasterix). Happy to open it as a PR, or to keep it
 downstream and follow whatever pattern you prefer.
+
+
+---
+
+## 6. healpix-convert — describe Climate DT generation 2, including the monthly stream (drafted 2026-10-23, not filed)
+
+**Request.** Add generation 2 to `settings/climatedt.py`: `generation = "2"`, stream `clmn`
+(monthly means) beside `clte`, resolutions `high` (nside 1024) and `standard` (nside 128),
+activities `baseline`/`hist` (1990-2014) and `projections`/`SSP3-7.0` (2015-2049), and parameters
+by numeric id.
+
+**Today.** The settings describe generation 1 only (`CDT_GENERATION = "1"`, `clte`, nside 128).
+
+**Why.** Generation 2 is what DestinE serves now and covers 1990-2049; its monthly stream makes
+decadal work cheap (a year of two fields at depth 10 is four requests of ~145 MB). Short names are
+ambiguous on the server: `mx2t24` returned `avg_snswrfcs` (235051), so ids must be used and checked.
+
+**Also.** Offer a conservative resampler for the sphere -> WGS84 step (bilinear in conservative
+mode, normalised), not only `nearest` and `PSF`: on same-size grids it is within 0.07 degC of an
+exact polygon overlap, and unlike PSF it cannot go negative on precipitation.
