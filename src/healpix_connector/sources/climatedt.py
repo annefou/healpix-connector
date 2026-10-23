@@ -18,6 +18,12 @@ through ``method``, restricted to the caller's cells (``out_cell_ids``), which
 is what makes a decade affordable. ``nearest`` is the default because PSF is a
 deconvolution: on precipitation it overshoots into negative values (114 of 480
 Iberian cells for a January mean), which a non-negative quantity cannot take.
+``bilinear_conservative`` (added 2026-10-23, ``healpix_connector.resampling``) is the
+recommended method: it preserves the field's integral, cannot ring, and against an
+exact polygon overlap it differs by 0.07 degC on average at depth 10. ``nearest``
+stays the default so that results made with v0.1.0 reproduce unchanged.
+For generation 2 monthly means at depth 10 (stream ``clmn``), see
+``healpix_connector.sources.climatedt_monthly``.
 Resampling is linear, so correcting the monthly mean is the same as correcting
 every timestep and then averaging.
 """
@@ -54,7 +60,7 @@ PARAM_ID = {name: meta[0] for name, meta in
 #: PSF threshold healpix-convert uses for its optional ellipsoid correction.
 PSF_THRESHOLD = 0.5
 #: healpix-convert's declared resampler for these fields, and the alternative.
-METHODS = ("nearest", "psf")
+METHODS = ("nearest", "psf", "bilinear_conservative")
 
 
 class MonthConverter(ClimateDTConverter):
@@ -143,6 +149,11 @@ class MonthlySampler:
 
         lon = ds.longitude.values.ravel().astype(float)
         lat = ds.latitude.values.ravel().astype(float)
+        if self.method == "bilinear_conservative":
+            from healpix_connector.resampling import BilinearConservative
+
+            self._resampler = BilinearConservative(lon, lat, np.sort(self.cell_ids.astype(np.uint64)), DEPTH)
+            return
         common = dict(lon_deg=lon, lat_deg=lat, level=DEPTH, out_cell_ids=self.cell_ids,
                       ellipsoid="WGS84", verbose=False)
         if self.method == "nearest":
@@ -167,6 +178,11 @@ class MonthlySampler:
         for name in self.variables:
             t_dim = next((d for d in ("valid_time", "time") if d in ds[name].dims), None)
             field = (ds[name].mean(t_dim) if t_dim else ds[name]).values.ravel().astype(float)
+            if self.method == "bilinear_conservative":
+                mean, _ = self._resampler(field)
+                order = np.searchsorted(self._resampler.cell_ids, self.cell_ids.astype(np.uint64))
+                values[name] = mean[order]
+                continue
             res = self._resampler.resample(field)
             order = np.searchsorted(np.asarray(res.cell_ids), self.cell_ids)
             values[name] = np.asarray(res.cell_data, dtype=float)[order]
