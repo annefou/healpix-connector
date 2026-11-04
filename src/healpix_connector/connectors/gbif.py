@@ -8,13 +8,13 @@ beyond that a GBIF download (record-level, with a DOI). Nothing is mirrored.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
-
-import numpy as np
+from pathlib import Path
 
 from healpix_connector import __version__
-from healpix_connector.cells import assign_cells, footprint_cells
+from healpix_connector.connectors._common import (  # noqa: F401  (re-exported)
+    USER_AGENT, Result, TooManyRecords, fetch_file, keep_in_region, to_cells)
+from healpix_connector.connectors._common import get_json as _get
 from healpix_connector.region import Region
 
 API = "https://api.gbif.org/v1"
@@ -27,49 +27,30 @@ SEARCH_LIMIT = 100_000  # GBIF refuses offset + limit beyond this (HTTP 400)
 # records, use a download.
 PRACTICAL_PAGING_LIMIT = 5_000
 PAGE = 300  # maximum page size of the occurrence search API
-USER_AGENT = f"healpix-connector/{__version__} (+https://github.com/annefou/healpix-connector)"
-
-
-class TooManyRecords(RuntimeError):
-    """The query matches more records than the search API can page through."""
-
-
-@dataclass
-class Result:
-    records: list[dict]
-    provenance: dict = field(default_factory=dict)
-
-
 PAGE_PAUSE_S = 0.25  # between successive pages, to stay under GBIF's rate limit
-
-
-def _get(session, url, params=None, retries=6, sleep=time.sleep):
-    """GET with retries on rate limiting (429) and server errors (5xx).
-
-    GBIF answers 429 when requests come too fast and 503 during backend
-    hiccups; both are retried, honouring ``Retry-After`` when given.
-    """
-    for attempt in range(retries):
-        r = session.get(url, params=params, timeout=60, headers={"User-Agent": USER_AGENT})
-        if r.status_code != 429 and r.status_code < 500:
-            r.raise_for_status()
-            return r.json()
-        wait = min(2 ** attempt, 60)
-        retry_after = (getattr(r, "headers", None) or {}).get("Retry-After")
-        if retry_after and str(retry_after).isdigit():
-            wait = max(wait, int(retry_after))
-        sleep(wait)
-    r.raise_for_status()
+#: Names of the checklists a record's taxonomy can come from; any other key is reported as itself.
+CHECKLISTS = {COL_XR: "Catalogue of Life eXtended Release", LEGACY_BACKBONE: "GBIF Backbone Taxonomy"}
 
 
 def normalise(rec: dict, checklist_key: str) -> dict:
     """Flatten one search-API record, keeping identity, position, time, taxonomy and the
     fields filters need: country, GBIF's own issue flags (passed through, not acted on)
-    and ``occurrenceStatus``, so that absence records are never read as presences."""
+    and ``occurrenceStatus``, so that absence records are never read as presences.
+
+    Returns the core record (``_common.CORE_FIELDS``) plus GBIF's native fields."""
     cls = (rec.get("classifications") or {}).get(checklist_key) or {}
     usage, accepted = cls.get("usage") or {}, cls.get("acceptedUsage") or {}
+    gbif_id = str(rec.get("gbifID") or rec.get("key"))
+    issues = list(rec.get("issues") or [])
     return {
-        "gbifID": str(rec.get("gbifID") or rec.get("key")),
+        "source": "GBIF",
+        "record_id": gbif_id,
+        "dataset_id": rec.get("datasetKey"),
+        "taxon_id": usage.get("key"),
+        "taxonomy": CHECKLISTS.get(checklist_key, checklist_key),
+        "taxonomy_key": checklist_key,
+        "flags": issues,
+        "gbifID": gbif_id,
         "occurrenceID": rec.get("occurrenceID"),
         "datasetKey": rec.get("datasetKey"),
         "eventDate": rec.get("eventDate"),
@@ -79,7 +60,7 @@ def normalise(rec: dict, checklist_key: str) -> dict:
         "countryCode": rec.get("countryCode"),
         "year": rec.get("year"),
         "occurrenceStatus": rec.get("occurrenceStatus"),
-        "issues": list(rec.get("issues") or []),
+        "issues": issues,
         "basisOfRecord": rec.get("basisOfRecord"),
         "license": rec.get("license"),
         "taxon_key": usage.get("key"),
@@ -134,7 +115,7 @@ def search(region: Region, *, checklist_key: str = COL_XR, taxon_key: str | None
             f"{count:,} records match; this call allows {cap:,}. Deep paging is pathologically "
             f"slow (~361 s for one page at offset 12,000) and the API stops at {SEARCH_LIMIT:,} "
             "anyway. Narrow the region or filters, raise max_records deliberately, or use a "
-            "GBIF download (record-level, with a DOI).")
+            "GBIF download (record-level, with a DOI) and read it with download_records.")
     raw = []
     for offset in range(0, count, PAGE):
         if offset:
@@ -143,11 +124,7 @@ def search(region: Region, *, checklist_key: str = COL_XR, taxon_key: str | None
         raw.extend(page["results"])
         if page.get("endOfRecords"):
             break
-    recs = [normalise(r, checklist_key) for r in raw]
-    lon = np.array([r["decimalLongitude"] for r in recs], dtype=float)
-    lat = np.array([r["decimalLatitude"] for r in recs], dtype=float)
-    keep = region.contains(lon, lat) if recs else np.zeros(0, bool)
-    recs = [r for r, k in zip(recs, keep) if k]
+    recs = keep_in_region([normalise(r, checklist_key) for r in raw], region)
     return Result(recs, {
         "source": "GBIF occurrence search API",
         "api": f"{API}/occurrence/search",
@@ -177,20 +154,47 @@ def download_metadata(key: str, session=None) -> dict:
     }
 
 
-def to_cells(records: list[dict], depth: int, *, footprints: bool = True) -> list[dict]:
-    """Add each record's cell and, optionally, the cells its uncertainty disc covers."""
-    if not records:
-        return []
-    lon = np.array([r["decimalLongitude"] for r in records], dtype=float)
-    lat = np.array([r["decimalLatitude"] for r in records], dtype=float)
-    cells = assign_cells(lon, lat, depth)
-    out = []
-    for r, c in zip(records, cells):
-        row = {**r, "depth": depth, "cell": int(c)}
-        if footprints:
-            unc = r.get("coordinateUncertaintyInMeters")
-            fp, known = footprint_cells(r["decimalLongitude"], r["decimalLatitude"],
-                                        None if unc is None else float(unc), depth)
-            row.update(footprint_cells=[int(x) for x in fp], footprint_known=known)
-        out.append(row)
-    return out
+#: Download formats that hold records (SPECIES_LIST does not; the others are not Darwin Core).
+RECORD_FORMATS = ("DWCA", "SIMPLE_CSV")
+
+
+def download_records(key: str, region: Region | None = None, *, session=None,
+                     keep_archive: str | Path | None = None, keep_terms: tuple[str, ...] = ()) -> Result:
+    """Records of an existing GBIF download (record-level, with its DOI), as core records.
+
+    The way past ``PRACTICAL_PAGING_LIMIT``: make the download on GBIF.org or with
+    the download API (an account is needed for that), then read it here. The
+    archive is fetched to a temporary file and deleted after reading, since
+    records are never mirrored; pass ``keep_archive`` (a file path) to keep it, in
+    which case an archive already there is read without fetching it again.
+    """
+    import tempfile
+
+    import requests
+
+    from healpix_connector.connectors import dwca
+
+    session = session or requests.Session()
+    meta = download_metadata(key, session=session)
+    if meta["status"] != "SUCCEEDED":
+        raise RuntimeError(f"GBIF download {key} is {meta['status']}, not SUCCEEDED")
+    if meta["format"] not in RECORD_FORMATS:
+        raise ValueError(f"GBIF download {key} is {meta['format']}; records need one of {RECORD_FORMATS}")
+    checklist = meta["checklist_key"]
+    known = not str(checklist).startswith("not specified")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(keep_archive) if keep_archive else Path(tmp) / f"{key}.zip"
+        if not target.exists():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            fetch_file(session, meta["download_link"], target)
+        res = dwca.read(target, region, source="GBIF", keep_terms=keep_terms,
+                        taxonomy=CHECKLISTS.get(checklist, checklist) if known else checklist,
+                        taxonomy_key=checklist if known else None)
+    res.provenance.update({
+        "source": "GBIF download", "api": f"{API}/occurrence/download/{key}",
+        "download_key": key, "doi": meta["doi"], "download_created": meta["created"],
+        "download_format": meta["format"], "predicate": meta["predicate"],
+        "total_records": meta["total_records"], "checklist_key": checklist,
+    })
+    return res

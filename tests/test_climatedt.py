@@ -52,3 +52,22 @@ def test_sampler_declares_the_source_cell_as_support():
     sampler = climatedt.MonthlySampler([10786, 10792], ["t2m"])
     assert sampler._resampler is None  # built on the first month, not before
     assert round(cell_size_m(climatedt.DEPTH) / 1000) == 51
+
+
+def test_a_month_becomes_a_one_step_dggs_source():
+    import numpy as np
+
+    from healpix_connector import sample as S
+
+    cells = np.array([5, 3, 9], dtype=np.int64)  # in request order, not sorted
+    m = climatedt.MonthlyMeans(year=2030, month=2, cell_ids=cells,
+                               values={"t2m": np.array([280.0, 281.0, 282.0])}, method="psf",
+                               support_m=0.0, filled_cells=np.array([9]))
+    ds = m.to_dataset()
+    assert ds["t2m"].attrs["units"] == "K" and ds.attrs["dggs"]["refinement_level"] == climatedt.DEPTH
+    src = S.from_dataset(ds)
+    assert src.variable == "t2m" and src.period == ("2030-02-01", "2030-02-28")
+    step, _ = S.time_step("2030-02-14", src)
+    got = S.sample_cells(src, np.array([3, 5, 9], dtype=np.uint64), climatedt.DEPTH, steps=step)
+    assert got["value"].tolist() == [281.0, 280.0, 282.0]
+    assert ds["filled_by_fallback"].sel(cells=ds.cell_ids == 9).item() == 1

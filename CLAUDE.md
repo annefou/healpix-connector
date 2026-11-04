@@ -12,7 +12,9 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - Say *depth* in code and prose. healpix-resample's `level` and the zarr metadata's
   `refinement_level` are the same number; map at the boundary.
 - Occurrences are read on request, never mirrored. Large requests use a GBIF
-  download (record-level, with DOI).
+  download (record-level, with DOI), read by `gbif.download_records` (archive deleted after
+  reading unless `keep_archive`). Any Darwin Core Archive (IPT, OBIS export) goes through
+  `connectors.dwca.read`, which joins Event-core occurrences to their (parent) events.
 - GBIF: always send `checklistKey` and record the taxonomy + version used. GBIF.org
   defaults to Catalogue of Life XR; the occurrence API still defaults to the legacy
   backbone. Use `gbifID` for record identity.
@@ -22,6 +24,13 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   rather than filtering on them. Count with `/statistics` before paging, and give it the
   same taxon and filters as the search or the count describes a different query.
 - Time matching keys on `eventDate`, never on publication date; report both.
+- Every connector's `normalise` returns `connectors._common.CORE_FIELDS` (plus its repository's
+  native fields) and reuses `_common`'s `get_json`, `Result`, `TooManyRecords`, `keep_in_region`
+  and `to_cells`. A new connector is added to `CONNECTORS` in `tests/test_connector_contract.py`.
+- Every environmental source ends as a DGGS dataset (`dggs_zarr.cell_dataset`, a `to_dataset`
+  method on live sources) read by `sample.from_dataset` / `open_source`. A time axis is CF
+  (`time` + `bounds` → `time_bnds`, exclusive end). A record is sampled at the one step that
+  contains its whole `eventDate`; a date spanning several steps gets NaN, never the nearest step.
 - Library first: CLI and MCP only wrap library functions. No LLM in any pipeline.
 
 ## Commands
@@ -30,8 +39,8 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 
 ## Git
 
-- Commit as `Anne Fouilloux <anne.fouilloux@lifewatch.eu>`. No Co-Authored-By trailer
-  (destined for the GRID4EARTH organisation).
+- Commit as `Anne Fouilloux <anne.fouilloux@lifewatch.eu>`. Claude may add its
+  Co-Authored-By trailer (Anne's decision, 2026-11-04).
 
 ## Temporary code (to move upstream once test 1 settles the method)
 
