@@ -22,6 +22,9 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   rather than filtering on them. Count with `/statistics` before paging, and give it the
   same taxon and filters as the search or the count describes a different query.
 - Time matching keys on `eventDate`, never on publication date; report both.
+- Every connector's `normalise` returns `connectors._common.CORE_FIELDS` (plus its repository's
+  native fields) and reuses `_common`'s `get_json`, `Result`, `TooManyRecords`, `keep_in_region`
+  and `to_cells`. A new connector is added to `CONNECTORS` in `tests/test_connector_contract.py`.
 - Library first: CLI and MCP only wrap library functions. No LLM in any pipeline.
 
 ## Commands
@@ -30,8 +33,8 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 
 ## Git
 
-- Commit as `Anne Fouilloux <anne.fouilloux@lifewatch.eu>`. No Co-Authored-By trailer
-  (destined for the GRID4EARTH organisation).
+- Commit as `Anne Fouilloux <anne.fouilloux@lifewatch.eu>`. Claude may add its
+  Co-Authored-By trailer (Anne's decision, 2026-11-04).
 
 ## Temporary code (to move upstream once test 1 settles the method)
 
