@@ -37,18 +37,23 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 
 - `binning.py` → healpix-resample: per-sample weights + `std`/`var` on `GroupByResampler`
   (it already supports WGS84; its reductions are unweighted mean/sum/min/max/prod).
-- `sources/chelsa.py` (and a future WorldClim converter) → healpix-convert, beside ERA5,
-  Climate DT and CAMS. Its converters handle non-Zarr inputs (ERA5 downloads GRIB) and it
-  already depends on rasterix.
+- `sources/chelsa.py` (and a future WorldClim converter): **stays here for now.** healpix-convert
+  answered (#11, 2026-10-05): a shared core plus built-in or third-party *settings*, not one
+  converter per dataset; its ERA5/CAMS/Climate DT converters are temporary and will be rebuilt on
+  the core. Built-in only if the source is public and stable, fits a small CI-run notebook, and
+  needs no dependency beyond the core's (CHELSA needs rasterio). Revisit when third-party settings
+  exist (healpix-convert #18).
 - `sources/climatedt.MonthConverter` → healpix-convert: `ClimateDTConverter` takes a single
   date and builds its cache name from it, so a MARS date range (which Polytope accepts, and
   which turns 7,305 requests for a decade into 120) cannot be cached. Ask for a date range
   plus a filename-safe cache tag; everything else there is used unchanged.
-- Also to report: `PSFResampler` has no non-negativity constraint, so on precipitation it
-  rings into negative values (114 of 480 Iberian cells, a January mean; `lam` up to 0.1 only
-  reduces it to 71). Worth a warning in its docstring, or a clipped/constrained variant.
-- Drafted in `docs/upstream-issues.md` (2026-09-22), not filed until Anne has read them. After the upstream
-  PRs land, delete the local converter; the connector reads converted data through STAC.
+- `PSFResampler` rings into negative values on precipitation (114 of 480 Iberian cells, a
+  January mean; `lam` up to 0.1 only reduces it to 71). **Fixed upstream** (healpix-resample
+  #72, in releases >= 2026.10.2): `resample(..., clip=(0.0, None))`, a bounded fit, not a clip
+  after it. Our lock still has 2026.7.0, which predates it.
+- Status of every upstream request is at the top of `docs/upstream-issues.md`; keep it there,
+  not here. After the upstream PRs land, delete the local converter; the connector reads
+  converted data through STAC.
 
 ## Measured limits (do not rediscover)
 
