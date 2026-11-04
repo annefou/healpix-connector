@@ -26,6 +26,30 @@ class CoarseSample:
     cell_width_m: float
     method: str
 
+    def to_dataset(self, depth: int, name: str, *, units: str, long_name: str | None = None,
+                   title: str | None = None, source_doi: str | None = None, license: str | None = None,
+                   period: tuple[str, str] | None = None, valid_time: str | None = None):
+        """This sample as a DGGS dataset, ready for ``sample.from_dataset``.
+
+        ``support_m`` travels with it, so every value sampled from it says that it
+        describes the source box rather than the cell.
+        """
+        from healpix_connector import __version__
+        from healpix_connector.dggs_zarr import cell_dataset
+
+        attrs = {"title": title or f"{name} on HEALPix depth {depth}", "support_m": float(self.support_m),
+                 "resampling_method": self.method, "producer": f"healpix-connector {__version__}"}
+        if source_doi:
+            attrs["source_doi"] = source_doi
+        if license:
+            attrs["license"] = license
+        if period:
+            attrs["climatology_bounds" if valid_time == "climatology" else "time_bounds"] = list(period)
+        if valid_time:
+            attrs["valid_time"] = valid_time
+        var_attrs = {"units": units, **({"long_name": long_name} if long_name else {})}
+        return cell_dataset(self.cell_ids, depth, {name: (self.value, var_attrs)}, attrs)
+
 
 def sample_cells_from_grid(values: np.ndarray, lon: np.ndarray, lat: np.ndarray,
                            cell_ids: np.ndarray, depth: int, res_deg: float) -> CoarseSample:
