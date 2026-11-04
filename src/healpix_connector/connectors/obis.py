@@ -19,13 +19,12 @@ Three things differ from GBIF and are visible in the API here:
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
-import numpy as np
-
 from healpix_connector import __version__
-from healpix_connector.cells import assign_cells, footprint_cells
+from healpix_connector.connectors._common import (  # noqa: F401  (re-exported)
+    USER_AGENT, Result, TooManyRecords, keep_in_region, to_cells)
+from healpix_connector.connectors._common import get_json as _get
 from healpix_connector.region import Region
 
 API = "https://api.obis.org/v3"
@@ -36,32 +35,6 @@ PAGE_PAUSE_S = 0.25
 FIELDS = ("id", "occurrenceID", "dataset_id", "scientificName", "aphiaID", "eventDate",
           "date_year", "decimalLongitude", "decimalLatitude",
           "coordinateUncertaintyInMeters", "basisOfRecord", "flags")
-USER_AGENT = f"healpix-connector/{__version__} (+https://github.com/annefou/healpix-connector)"
-
-
-class TooManyRecords(RuntimeError):
-    """The query matches more records than this call was allowed to fetch."""
-
-
-@dataclass
-class Result:
-    records: list[dict]
-    provenance: dict = field(default_factory=dict)
-
-
-def _get(session, url, params=None, retries=6, sleep=time.sleep):
-    """GET with retries on rate limiting (429) and server errors (5xx)."""
-    for attempt in range(retries):
-        r = session.get(url, params=params, timeout=60, headers={"User-Agent": USER_AGENT})
-        if r.status_code != 429 and r.status_code < 500:
-            r.raise_for_status()
-            return r.json()
-        wait = min(2 ** attempt, 60)
-        retry_after = (getattr(r, "headers", None) or {}).get("Retry-After")
-        if retry_after and str(retry_after).isdigit():
-            wait = max(wait, int(retry_after))
-        sleep(wait)
-    r.raise_for_status()
 
 
 def normalise(rec: dict) -> dict:
@@ -70,8 +43,15 @@ def normalise(rec: dict) -> dict:
     ``flags`` is passed through rather than acted on: ``ON_LAND`` on a marine
     record, or ``NO_ACCEPTED_NAME``, is the repository's own judgement and
     belongs in the result, not in a filter we invent.
+
+    Returns the core record (``_common.CORE_FIELDS``) plus OBIS's native fields.
     """
     return {
+        "source": "OBIS",
+        "record_id": None if rec.get("id") is None else str(rec["id"]),
+        "taxon_id": rec.get("aphiaID"),
+        "taxonomy": BACKBONE,
+        "taxonomy_key": None,  # WoRMS has no checklist key; the AphiaID is the identifier
         "obisID": rec.get("id"),
         "occurrenceID": rec.get("occurrenceID"),
         "dataset_id": rec.get("dataset_id"),
@@ -157,13 +137,7 @@ def search(region: Region, *, aphia_id: int | None = None, filters: dict | None 
         raw.extend(results)
         after = results[-1].get("id")
 
-    recs = [normalise(r) for r in raw]
-    recs = [r for r in recs
-            if r["decimalLongitude"] is not None and r["decimalLatitude"] is not None]
-    lon = np.array([r["decimalLongitude"] for r in recs], dtype=float)
-    lat = np.array([r["decimalLatitude"] for r in recs], dtype=float)
-    keep = region.contains(lon, lat) if recs else np.zeros(0, bool)
-    recs = [r for r, k in zip(recs, keep) if k]
+    recs = keep_in_region([normalise(r) for r in raw], region)
     return Result(recs, {
         "source": "OBIS occurrence API",
         "api": f"{API}/occurrence",
@@ -195,22 +169,3 @@ def dataset_metadata(dataset_id: str, session=None) -> dict:
             "citation": top.get("citation"), "url": top.get("url"),
             "published": top.get("published"),
             "institutes": [i.get("name") for i in (top.get("institutes") or [])]}
-
-
-def to_cells(records: list[dict], depth: int, *, footprints: bool = True) -> list[dict]:
-    """Add each record's cell and, optionally, the cells its uncertainty disc covers."""
-    if not records:
-        return []
-    lon = np.array([r["decimalLongitude"] for r in records], dtype=float)
-    lat = np.array([r["decimalLatitude"] for r in records], dtype=float)
-    cells = assign_cells(lon, lat, depth)
-    out = []
-    for r, c in zip(records, cells):
-        row = {**r, "depth": depth, "cell": int(c)}
-        if footprints:
-            unc = r.get("coordinateUncertaintyInMeters")
-            fp, known = footprint_cells(r["decimalLongitude"], r["decimalLatitude"],
-                                        None if unc is None else float(unc), depth)
-            row.update(footprint_cells=[int(x) for x in fp], footprint_known=known)
-        out.append(row)
-    return out

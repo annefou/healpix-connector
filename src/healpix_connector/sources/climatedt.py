@@ -114,6 +114,33 @@ class MonthlyMeans:
     #: per variable, cells the bounded PSF fit held at ``LOWER_BOUND`` (PSF only)
     clipped_cells: dict[str, int] = field(default_factory=dict)
 
+    def to_dataset(self):
+        """This month as a DGGS dataset with a one-step CF time axis (units as delivered).
+
+        Join months with ``dggs_zarr.concat_time``; sample with ``sample.from_dataset``.
+        """
+        from healpix_connector import __version__
+        from healpix_connector.dggs_zarr import cell_dataset, month_bounds
+
+        meta = {**cfg.CDT_SFC_VARIABLE_META, **EXTRA_PARAMS}
+        variables = {name: (v[None, :], {"units": meta[name][1], "long_name": meta[name][2],
+                                         "cell_methods": "time: mean"})
+                     for name, v in self.values.items()}
+        for name in self.clipped_cells:  # solved as a bounded PSF fit
+            variables[name][1]["resampling_lower_bound"] = LOWER_BOUND[name]
+        variables["filled_by_fallback"] = (
+            np.isin(self.cell_ids, self.filled_cells).astype(np.int8),
+            {"long_name": "1 where the PSF kernel had too little support and healpix-resample's "
+                          "fallback filled the cell", "units": "1"})
+        return cell_dataset(self.cell_ids, DEPTH, variables, {
+            "title": f"Climate DT {SOURCE['model']} {SOURCE['experiment']} monthly means "
+                     f"on HEALPix depth {DEPTH}",
+            "source": SOURCE["name"], "source_access": SOURCE["access"],
+            "valid_time": "monthly mean",
+            "resampling_method": f"{self.method} (sphere -> WGS84, healpix-resample)",
+            "producer": f"healpix-connector {__version__}",
+        }, time_bounds=month_bounds(self.year, [self.month]))
+
 
 class MonthlySampler:
     """Monthly means of Climate DT variables over a fixed set of cells.

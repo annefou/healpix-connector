@@ -98,6 +98,31 @@ class YearOfMonths:
     depth: int
     requests: list
 
+    def to_dataset(self):
+        """This year as a DGGS dataset with 12 monthly CF time steps.
+
+        Each parameter comes with ``<param>_valid_share``. Join years with
+        ``dggs_zarr.concat_time``; sample with ``sample.from_dataset``.
+        """
+        from healpix_connector import __version__
+        from healpix_connector.dggs_zarr import cell_dataset, month_bounds
+
+        variables = {}
+        for p, v in self.values.items():
+            variables[p] = (v, {"units": self.units[p], "cell_methods": "time: mean"})
+            variables[f"{p}_valid_share"] = (self.valid_share[p], {
+                "long_name": f"share of the cell covered by source samples ({p})", "units": "1"})
+        r = self.requests[0] if self.requests else {}
+        return cell_dataset(self.cell_ids, self.depth, variables, {
+            "title": f"Climate DT {r.get('model', '')} {r.get('experiment', '')} monthly means "
+                     f"(stream clmn) on HEALPix depth {self.depth}",
+            "source": "Climate DT (DestinE), generation 2",
+            "valid_time": "monthly mean",
+            "resampling_method": f"{self.method} (sphere -> WGS84, healpix-resample)",
+            "requests": json.dumps(self.requests),
+            "producer": f"healpix-connector {__version__}",
+        }, time_bounds=month_bounds(self.year, range(1, 13)))
+
 
 class MonthlyStreamSampler:
     """Monthly means of Climate DT generation 2 over fixed WGS84 cells, one year at a time.

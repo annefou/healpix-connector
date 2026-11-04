@@ -12,7 +12,9 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - Say *depth* in code and prose. healpix-resample's `level` and the zarr metadata's
   `refinement_level` are the same number; map at the boundary.
 - Occurrences are read on request, never mirrored. Large requests use a GBIF
-  download (record-level, with DOI).
+  download (record-level, with DOI), read by `gbif.download_records` (archive deleted after
+  reading unless `keep_archive`). Any Darwin Core Archive (IPT, OBIS export) goes through
+  `connectors.dwca.read`, which joins Event-core occurrences to their (parent) events.
 - GBIF: always send `checklistKey` and record the taxonomy + version used. GBIF.org
   defaults to Catalogue of Life XR; the occurrence API still defaults to the legacy
   backbone. Use `gbifID` for record identity.
@@ -22,6 +24,13 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
   rather than filtering on them. Count with `/statistics` before paging, and give it the
   same taxon and filters as the search or the count describes a different query.
 - Time matching keys on `eventDate`, never on publication date; report both.
+- Every connector's `normalise` returns `connectors._common.CORE_FIELDS` (plus its repository's
+  native fields) and reuses `_common`'s `get_json`, `Result`, `TooManyRecords`, `keep_in_region`
+  and `to_cells`. A new connector is added to `CONNECTORS` in `tests/test_connector_contract.py`.
+- Every environmental source ends as a DGGS dataset (`dggs_zarr.cell_dataset`, a `to_dataset`
+  method on live sources) read by `sample.from_dataset` / `open_source`. A time axis is CF
+  (`time` + `bounds` → `time_bnds`, exclusive end). A record is sampled at the one step that
+  contains its whole `eventDate`; a date spanning several steps gets NaN, never the nearest step.
 - Library first: CLI and MCP only wrap library functions. No LLM in any pipeline.
 
 ## Commands
@@ -30,25 +39,30 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 
 ## Git
 
-- Commit as `Anne Fouilloux <anne.fouilloux@lifewatch.eu>`. No Co-Authored-By trailer
-  (destined for the GRID4EARTH organisation).
+- Commit as `Anne Fouilloux <anne.fouilloux@lifewatch.eu>`. Claude may add its
+  Co-Authored-By trailer (Anne's decision, 2026-11-04).
 
 ## Temporary code (to move upstream once test 1 settles the method)
 
 - `binning.py` → healpix-resample: per-sample weights + `std`/`var` on `GroupByResampler`
   (it already supports WGS84; its reductions are unweighted mean/sum/min/max/prod).
-- `sources/chelsa.py` (and a future WorldClim converter) → healpix-convert, beside ERA5,
-  Climate DT and CAMS. Its converters handle non-Zarr inputs (ERA5 downloads GRIB) and it
-  already depends on rasterix.
+- `sources/chelsa.py` (and a future WorldClim converter): **stays here for now.** healpix-convert
+  answered (#11, 2026-10-05): a shared core plus built-in or third-party *settings*, not one
+  converter per dataset; its ERA5/CAMS/Climate DT converters are temporary and will be rebuilt on
+  the core. Built-in only if the source is public and stable, fits a small CI-run notebook, and
+  needs no dependency beyond the core's (CHELSA needs rasterio). Revisit when third-party settings
+  exist (healpix-convert #18).
 - `sources/climatedt.MonthConverter` → healpix-convert: `ClimateDTConverter` takes a single
   date and builds its cache name from it, so a MARS date range (which Polytope accepts, and
   which turns 7,305 requests for a decade into 120) cannot be cached. Ask for a date range
   plus a filename-safe cache tag; everything else there is used unchanged.
-- Also to report: `PSFResampler` has no non-negativity constraint, so on precipitation it
-  rings into negative values (114 of 480 Iberian cells, a January mean; `lam` up to 0.1 only
-  reduces it to 71). Worth a warning in its docstring, or a clipped/constrained variant.
-- Drafted in `docs/upstream-issues.md` (2026-09-22), not filed until Anne has read them. After the upstream
-  PRs land, delete the local converter; the connector reads converted data through STAC.
+- `PSFResampler` rings into negative values on precipitation (114 of 480 Iberian cells, a
+  January mean; `lam` up to 0.1 only reduces it to 71). **Fixed upstream** (healpix-resample
+  #72, in releases >= 2026.10.2): `resample(..., clip=(0.0, None))`, a bounded fit, not a clip
+  after it. We require >= 2026.10.2; `sources/climatedt` uses it for `LOWER_BOUND` variables.
+- Status of every upstream request is at the top of `docs/upstream-issues.md`; keep it there,
+  not here. After the upstream PRs land, delete the local converter; the connector reads
+  converted data through STAC.
 
 ## Measured limits (do not rediscover)
 

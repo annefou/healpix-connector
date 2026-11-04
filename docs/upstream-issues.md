@@ -9,7 +9,30 @@ healpix-resample [#63](https://github.com/GRID4EARTH/healpix-resample/issues/63)
 [#11](https://github.com/GRID4EARTH/healpix-convert/issues/11) (5). Checked against `main` on 2026-09-22
 (healpix-resample `2026.7.0` released, `main` newer; healpix-convert `2026.9.0`).
 
-**Landscape.** healpix-resample: 5 open PRs (4 dependabot, #57 notebooks environment)
+**Status, checked 2026-11-04.**
+
+| # | Issue | State |
+|---|---|---|
+| 1 | resample #63 | open, no reply |
+| 2 | resample #64 | open, no reply |
+| 3 | resample #65 | **closed 2026-10-15** by PR #72: `PSFResampler.resample(..., clip=(lo, hi), max_outer=10)`, a bounded (active-set) least-squares fit; `ResampleResults.n_clipped_low/high`. In releases >= 2026.10.2. Also closes healpix-convert #35 (use the bounded fit for bounded fields). Used here since PR #4 (`healpix-resample >= 2026.10.2`; `clip=(0.0, None)` for `tprate`). |
+| 4 | convert #12 | open, no reply |
+| 5 | convert #11 | **answered 2026-10-05** (benbovy): see below |
+| 6 | Climate DT generation 2 | drafted 2026-10-23, reworded 2026-11-04 after #11, not filed |
+
+**The answer to #11.** healpix-convert aims at a shared core (one internal data model in
+`ConvertStagingCache`/`ConvertSettings`, generic group converters in `healpix_converters`,
+STAC + Zarr-conventions output configured through settings) plus built-in or third-party
+*settings*. The per-dataset modules in `healpix_convert/converters` (ERA5, CAMS, Climate DT)
+are temporary and will be refactored onto the core. Built-in support for a product is
+considered when the source is public, stable and mature; its conversion fits a small
+notebook runnable in CI with little customisation; and it needs no dependency beyond the
+core's. A mechanism to coerce custom input metadata into the data model is planned; a
+registry for third-party settings is #18. Consequence for us: CHELSA stays downstream until
+third-party settings exist; requests about Climate DT should describe the service, not
+patch `converters/climatedt.py`.
+
+**Landscape (2026-09-22).** healpix-resample: 5 open PRs (4 dependabot, #57 notebooks environment)
 and 5 open issues, none covering these. healpix-convert: 1 open issue (#9, licence
 links) and 7 open PRs, 6 of them ours from 2026-09-07, still unreviewed.
 
@@ -119,19 +142,40 @@ downstream and follow whatever pattern you prefer.
 
 ---
 
-## 6. healpix-convert — describe Climate DT generation 2, including the monthly stream (drafted 2026-10-23, not filed)
+## 6. healpix-convert — Climate DT generation 2: what the service offers, for the settings (drafted 2026-10-23, reworded 2026-11-04, not filed)
 
-**Request.** Add generation 2 to `settings/climatedt.py`: `generation = "2"`, stream `clmn`
-(monthly means) beside `clte`, resolutions `high` (nside 1024) and `standard` (nside 128),
-activities `baseline`/`hist` (1990-2014) and `projections`/`SSP3-7.0` (2015-2049), and parameters
-by numeric id.
+**Title.** Climate DT generation 2 (incl. the monthly `clmn` stream): service facts for the settings
 
-**Today.** The settings describe generation 1 only (`CDT_GENERATION = "1"`, `clte`, nside 128).
+**Request.** When Climate DT moves onto the core, please cover generation 2, which is what
+DestinE serves now. The settings today describe generation 1 only (`CDT_GENERATION = "1"`,
+hourly `clte`, nside 128). We are not proposing a patch to `converters/climatedt.py`, since
+#11 says it will be refactored; this is the information the new settings will need, measured
+against the service on 2026-10-23.
 
-**Why.** Generation 2 is what DestinE serves now and covers 1990-2049; its monthly stream makes
-decadal work cheap (a year of two fields at depth 10 is four requests of ~145 MB). Short names are
-ambiguous on the server: `mx2t24` returned `avg_snswrfcs` (235051), so ids must be used and checked.
+**Generation 2, as served.**
 
-**Also.** Offer a conservative resampler for the sphere -> WGS84 step (bilinear in conservative
-mode, normalised), not only `nearest` and `PSF`: on same-size grids it is within 0.07 degC of an
-exact polygon overlap, and unlike PSF it cannot go negative on precipitation.
+| | |
+|---|---|
+| models | IFS-FESOM (LUMI), IFS-NEMO (MareNostrum 5) |
+| streams | `clte` (hourly) and **`clmn` (monthly means)** |
+| resolutions | `high` = nside 1024 (depth 10), `standard` = nside 128 (depth 7); native HEALPix NESTED on a sphere |
+| activities | `baseline` / `hist`, 1990-2014; `projections` / `SSP3-7.0`, 2015-2049 |
+| monthly fields | `avg_2t`, `avg_tprate`, `avg_2d`; **no monthly max/min temperature** |
+
+**Two traps.**
+
+- **Short names can resolve to a different field.** Requesting `mx2t24` on `clmn` returned
+  `avg_snswrfcs` (paramId 235051), with no error. Request by numeric paramId, and check the
+  `paramId` of every returned GRIB message against what was asked.
+- **MareNostrum 5 drops large transfers** (~500 MB). One parameter and half a year per request
+  goes through; a year of two fields at depth 10 is four requests of ~145 MB.
+
+**Why.** Generation 1 has no monthly stream and covers 2020-2039 only, so decadal work means
+hundreds of hourly requests (#12). Generation 2's `clmn` covers 1990-2049 in a handful.
+
+**Related.** For the sphere -> WGS84 step on same-size grids, a conservative resampler
+(bilinear in conservative mode, normalised) is within 0.07 degC of an exact polygon overlap
+at depth 10, against 0.80 degC for taking the same cell id, and cannot go negative. Worth
+offering as a resampler choice for this step beside `nearest` and PSF.
+For PSF on precipitation, the bounded fit from healpix-resample #72 (`clip=(0.0, None)`) is
+what #35 asks to use.

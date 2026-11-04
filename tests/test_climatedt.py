@@ -55,6 +55,25 @@ def test_sampler_declares_the_source_cell_as_support():
     assert round(cell_size_m(climatedt.DEPTH) / 1000) == 51
 
 
+def test_a_month_becomes_a_one_step_dggs_source():
+    import numpy as np
+
+    from healpix_connector import sample as S
+
+    cells = np.array([5, 3, 9], dtype=np.int64)  # in request order, not sorted
+    m = climatedt.MonthlyMeans(year=2030, month=2, cell_ids=cells,
+                               values={"t2m": np.array([280.0, 281.0, 282.0])}, method="psf",
+                               support_m=0.0, filled_cells=np.array([9]))
+    ds = m.to_dataset()
+    assert ds["t2m"].attrs["units"] == "K" and ds.attrs["dggs"]["refinement_level"] == climatedt.DEPTH
+    src = S.from_dataset(ds)
+    assert src.variable == "t2m" and src.period == ("2030-02-01", "2030-02-28")
+    step, _ = S.time_step("2030-02-14", src)
+    got = S.sample_cells(src, np.array([3, 5, 9], dtype=np.uint64), climatedt.DEPTH, steps=step)
+    assert got["value"].tolist() == [281.0, 280.0, 282.0]
+    assert ds["filled_by_fallback"].sel(cells=ds.cell_ids == 9).item() == 1
+
+
 def _sphere_grid_and_wgs84_cells():
     """Climate DT's native grid near Iberia (depth 7 on a sphere), and WGS84 cells inside it."""
     from types import SimpleNamespace
@@ -111,3 +130,14 @@ def test_bilinear_conservative_reports_no_clipping():
     values, n = sampler._resample("tprate", np.full(lon.size, 2e-5))
     assert n is None
     np.testing.assert_allclose(values, 2e-5, rtol=1e-6)
+
+
+def test_a_bounded_variable_says_so_in_its_dataset():
+    m = climatedt.MonthlyMeans(year=2030, month=1, cell_ids=np.array([3, 5], dtype=np.int64),
+                               values={"tprate": np.array([0.0, 1e-5]),
+                                       "t2m": np.array([280.0, 281.0])},
+                               method="psf", support_m=0.0, filled_cells=np.array([], dtype=np.int64),
+                               clipped_cells={"tprate": 1})
+    ds = m.to_dataset()
+    assert ds["tprate"].attrs["resampling_lower_bound"] == 0.0
+    assert "resampling_lower_bound" not in ds["t2m"].attrs
