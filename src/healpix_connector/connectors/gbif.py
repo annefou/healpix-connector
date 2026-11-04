@@ -9,10 +9,11 @@ from __future__ import annotations
 
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 
 from healpix_connector import __version__
 from healpix_connector.connectors._common import (  # noqa: F401  (re-exported)
-    USER_AGENT, Result, TooManyRecords, keep_in_region, to_cells)
+    USER_AGENT, Result, TooManyRecords, fetch_file, keep_in_region, to_cells)
 from healpix_connector.connectors._common import get_json as _get
 from healpix_connector.region import Region
 
@@ -114,7 +115,7 @@ def search(region: Region, *, checklist_key: str = COL_XR, taxon_key: str | None
             f"{count:,} records match; this call allows {cap:,}. Deep paging is pathologically "
             f"slow (~361 s for one page at offset 12,000) and the API stops at {SEARCH_LIMIT:,} "
             "anyway. Narrow the region or filters, raise max_records deliberately, or use a "
-            "GBIF download (record-level, with a DOI).")
+            "GBIF download (record-level, with a DOI) and read it with download_records.")
     raw = []
     for offset in range(0, count, PAGE):
         if offset:
@@ -151,3 +152,49 @@ def download_metadata(key: str, session=None) -> dict:
         "checklist_key": req.get("checklistKey") or "not specified in the download request",
         "download_link": d.get("downloadLink"),
     }
+
+
+#: Download formats that hold records (SPECIES_LIST does not; the others are not Darwin Core).
+RECORD_FORMATS = ("DWCA", "SIMPLE_CSV")
+
+
+def download_records(key: str, region: Region | None = None, *, session=None,
+                     keep_archive: str | Path | None = None, keep_terms: tuple[str, ...] = ()) -> Result:
+    """Records of an existing GBIF download (record-level, with its DOI), as core records.
+
+    The way past ``PRACTICAL_PAGING_LIMIT``: make the download on GBIF.org or with
+    the download API (an account is needed for that), then read it here. The
+    archive is fetched to a temporary file and deleted after reading, since
+    records are never mirrored; pass ``keep_archive`` (a file path) to keep it, in
+    which case an archive already there is read without fetching it again.
+    """
+    import tempfile
+
+    import requests
+
+    from healpix_connector.connectors import dwca
+
+    session = session or requests.Session()
+    meta = download_metadata(key, session=session)
+    if meta["status"] != "SUCCEEDED":
+        raise RuntimeError(f"GBIF download {key} is {meta['status']}, not SUCCEEDED")
+    if meta["format"] not in RECORD_FORMATS:
+        raise ValueError(f"GBIF download {key} is {meta['format']}; records need one of {RECORD_FORMATS}")
+    checklist = meta["checklist_key"]
+    known = not str(checklist).startswith("not specified")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(keep_archive) if keep_archive else Path(tmp) / f"{key}.zip"
+        if not target.exists():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            fetch_file(session, meta["download_link"], target)
+        res = dwca.read(target, region, source="GBIF", keep_terms=keep_terms,
+                        taxonomy=CHECKLISTS.get(checklist, checklist) if known else checklist,
+                        taxonomy_key=checklist if known else None)
+    res.provenance.update({
+        "source": "GBIF download", "api": f"{API}/occurrence/download/{key}",
+        "download_key": key, "doi": meta["doi"], "download_created": meta["created"],
+        "download_format": meta["format"], "predicate": meta["predicate"],
+        "total_records": meta["total_records"], "checklist_key": checklist,
+    })
+    return res

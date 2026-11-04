@@ -12,7 +12,9 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - Say *depth* in code and prose. healpix-resample's `level` and the zarr metadata's
   `refinement_level` are the same number; map at the boundary.
 - Occurrences are read on request, never mirrored. Large requests use a GBIF
-  download (record-level, with DOI).
+  download (record-level, with DOI), read by `gbif.download_records` (archive deleted after
+  reading unless `keep_archive`). Any Darwin Core Archive (IPT, OBIS export) goes through
+  `connectors.dwca.read`, which joins Event-core occurrences to their (parent) events.
 - GBIF: always send `checklistKey` and record the taxonomy + version used. GBIF.org
   defaults to Catalogue of Life XR; the occurrence API still defaults to the legacy
   backbone. Use `gbifID` for record identity.

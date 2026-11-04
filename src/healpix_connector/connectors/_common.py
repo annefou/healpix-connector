@@ -67,6 +67,20 @@ def get_json(session, url, params=None, retries=6, sleep=time.sleep):
     r.raise_for_status()
 
 
+def fetch_file(session, url, target, chunk_bytes: int = 1 << 20) -> None:
+    """Stream ``url`` to ``target`` (written under a temporary name, then renamed)."""
+    from pathlib import Path
+
+    target = Path(target)
+    part = target.with_name(target.name + ".part")
+    with session.get(url, stream=True, timeout=600, headers={"User-Agent": USER_AGENT}) as r:
+        r.raise_for_status()
+        with open(part, "wb") as f:
+            for block in r.iter_content(chunk_bytes):
+                f.write(block)
+    part.replace(target)
+
+
 def keep_in_region(records: list[dict], region: Region) -> list[dict]:
     """Records with coordinates that lie inside ``region`` (the exact test after a padded query)."""
     recs = [r for r in records
