@@ -5,6 +5,8 @@ ours is the month-long request, the cache name that survives a date range, and
 the parameter table.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -141,3 +143,25 @@ def test_a_bounded_variable_says_so_in_its_dataset():
     ds = m.to_dataset()
     assert ds["tprate"].attrs["resampling_lower_bound"] == 0.0
     assert "resampling_lower_bound" not in ds["t2m"].attrs
+
+
+def test_healpix_convert_still_has_what_month_converter_relies_on():
+    """``MonthConverter`` uses private parts of healpix-convert's ``ClimateDTConverter``.
+
+    healpix-convert plans to rebuild that converter on its core (healpix-convert#11). If
+    this fails, that has happened: port ``MonthConverter`` to the new API (healpix-convert
+    #77 shows the shape for ERA5) instead of patching around it. See docs/upstream-issues.md.
+    """
+    import inspect
+
+    from healpix_convert.converters.climatedt import ClimateDTConverter
+
+    missing = [m for m in ("_download", "_load_dataset", "_grib_path")
+               if not callable(getattr(ClimateDTConverter, m, None))]
+    assert not missing, f"healpix-convert's ClimateDTConverter no longer has {missing}"
+    for m in ("_download", "_load_dataset"):
+        params = list(inspect.signature(getattr(ClimateDTConverter, m)).parameters)
+        assert params == ["self", "grib_path"], f"ClimateDTConverter.{m}{params} changed"
+    conv = climatedt.MonthConverter(date="20300101/to/20300131", time="0000/1200",
+                                    params="167", local_dir=Path("unused"))
+    assert hasattr(conv, "_ds"), "ClimateDTConverter no longer keeps the dataset in _ds"

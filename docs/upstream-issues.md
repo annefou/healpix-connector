@@ -9,16 +9,35 @@ healpix-resample [#63](https://github.com/GRID4EARTH/healpix-resample/issues/63)
 [#11](https://github.com/GRID4EARTH/healpix-convert/issues/11) (5). Checked against `main` on 2026-09-22
 (healpix-resample `2026.7.0` released, `main` newer; healpix-convert `2026.9.0`).
 
-**Status, checked 2026-11-04.**
+**Status, checked 2026-11-04 (late).** Every issue and PR of both repos, all states, was read for overlap.
 
 | # | Issue | State |
 |---|---|---|
 | 1 | resample #63 | open, no reply |
 | 2 | resample #64 | open, no reply |
 | 3 | resample #65 | **closed 2026-10-15** by PR #72: `PSFResampler.resample(..., clip=(lo, hi), max_outer=10)`, a bounded (active-set) least-squares fit; `ResampleResults.n_clipped_low/high`. In releases >= 2026.10.2. Also closes healpix-convert #35 (use the bounded fit for bounded fields). Used here since PR #4 (`healpix-resample >= 2026.10.2`; `clip=(0.0, None)` for `tprate`). |
-| 4 | convert #12 | open, no reply |
-| 5 | convert #11 | **answered 2026-10-05** (benbovy): see below |
+| 4 | convert #12 | open. tinaok's PR **#77** does the same for ERA5 (MARS date ranges, cache tag, public `download()`/`dataset()`) and says Climate DT can follow. We offered to port it after #77 merges, or to wait if the converter is rebuilt on the core first (comment 2026-11-04); waiting for her answer. |
+| 5 | convert #11 | **answered 2026-10-05** (benbovy): see below. We replied 2026-11-04; left open, since writing the criteria down in their docs is still to do. |
 | 6 | convert [#104](https://github.com/GRID4EARTH/healpix-convert/issues/104) | **filed 2026-11-04** (reworded after #11; paramIds and base request added) |
+
+**Our other threads on healpix-convert.**
+
+| Thread | State |
+|---|---|
+| PR #4 (`cell_methods` inferred from the resampler) | **closed 2026-11-04**: the reviewers showed the resampler does not determine it; `metadata.override_attrs` (#59, from #36) sets it explicitly. An override replaces the input's `cell_methods` rather than appending; nobody has asked for appending. |
+| #86 (healpix-resample floor that returns only NaN) | part 1 (raise the floor) is in jmdelouis's PR #92 (`>= 2026.10.3`); part 2 (fail when a variable has no finite value anywhere) is **not** in the pipeline: #41 only logs a warning per chunk. |
+| PR #7 (`CITATION.cff`) | merged with its open points undecided; the TODO for an ORCID is still there. |
+
+**To watch.** healpix-resample #94 (open): with its defaults (`lam=0`, no `clip`), `PSFResampler`
+returns values far outside the input range when the samples are sparser than the cells. Our
+`sources/climatedt` PSF path uses those defaults for every variable except `tprate`; on same-size
+grids (one sample per cell) we have not seen it, but follow the fix they choose.
+
+**What we rely on that may go.** `sources/climatedt.MonthConverter` subclasses healpix-convert's
+`ClimateDTConverter` and uses its private `_download`, `_load_dataset`, `_grib_path` and `_ds`.
+#11 says that converter will be rebuilt on the core. `tests/test_climatedt.py` fails by name if
+they disappear, and CI runs the `climatedt` environment so the lock update that brings it in
+cannot pass unnoticed.
 
 **The answer to #11.** healpix-convert aims at a shared core (one internal data model in
 `ConvertStagingCache`/`ConvertSettings`, generic group converters in `healpix_converters`,
