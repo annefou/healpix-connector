@@ -39,3 +39,17 @@ def test_shape_mismatch_is_refused():
     lon, lat = grid()
     with pytest.raises(ValueError):
         sample_cells_from_grid(np.ones((3, 3)), lon, lat, assign_cells([-3.7], [40.4], 8), 8, RES)
+
+
+def test_cell_outside_the_grid_is_refused():
+    # Before this check a cell outside the grid silently took the edge box's value.
+    lon, lat = grid()
+    with pytest.raises(ValueError, match="outside the source grid"):
+        sample_cells_from_grid(np.ones((lat.size, lon.size)), lon, lat, assign_cells([20.0], [40.4], 8), 8, RES)
+
+
+def test_grid_in_0_360_longitudes_with_a_cell_west_of_0_is_refused():
+    lon = np.arange(0, 359.76, RES)
+    lat = np.arange(45, 33.99, -RES)
+    with pytest.raises(ValueError, match="outside the source grid"):
+        sample_cells_from_grid(np.ones((lat.size, lon.size)), lon, lat, assign_cells([-3.7], [40.4], 8), 8, RES)

@@ -41,6 +41,15 @@ def sample_cells_from_grid(values: np.ndarray, lon: np.ndarray, lat: np.ndarray,
     cell_ids = np.asarray(cell_ids, dtype=np.uint64)
     clon, clat = nested.healpix_to_lonlat(cell_ids, np.uint8(depth), ellipsoid=ELLIPSOID)
     clon = np.where(clon > 180, clon - 360, clon)
+    # Every cell centre must fall inside a source box: the nearest-point lookup below would otherwise return
+    # the edge value for a cell outside the grid (or for a grid in 0-360 longitudes and a cell west of 0).
+    half = res_deg / 2
+    outside = ((clat < lat.min() - half) | (clat > lat.max() + half)
+               | (clon < lon.min() - half) | (clon > lon.max() + half))
+    if outside.any():
+        raise ValueError(f"{int(outside.sum())} of {cell_ids.size} cell centres lie outside the source grid "
+                         f"(lon {lon.min()}..{lon.max()}, lat {lat.min()}..{lat.max()}, longitudes -180..180 "
+                         "expected); request a larger area or drop those cells")
     i = np.abs(lat[:, None] - clat[None, :]).argmin(axis=0)
     j = np.abs(lon[:, None] - clon[None, :]).argmin(axis=0)
     support = pixel_size_m(res_deg, float(np.mean(lat)))
