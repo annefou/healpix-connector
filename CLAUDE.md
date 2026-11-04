@@ -59,7 +59,7 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - `PSFResampler` rings into negative values on precipitation (114 of 480 Iberian cells, a
   January mean; `lam` up to 0.1 only reduces it to 71). **Fixed upstream** (healpix-resample
   #72, in releases >= 2026.10.2): `resample(..., clip=(0.0, None))`, a bounded fit, not a clip
-  after it. Our lock still has 2026.7.0, which predates it.
+  after it. We require >= 2026.10.2; `sources/climatedt` uses it for `LOWER_BOUND` variables.
 - Status of every upstream request is at the top of `docs/upstream-issues.md`; keep it there,
   not here. After the upstream PRs land, delete the local converter; the connector reads
   converted data through STAC.

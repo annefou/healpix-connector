@@ -22,6 +22,9 @@ polytope-client = "*"
 # GRID4EARTH's own Climate DT converter: request definition, HEALPix conventions
 # and the sphere -> WGS84 correction all come from there, not from us.
 healpix-convert = ">=2026.9"
+# Declared directly: healpix-convert only asks for >=2026.7.0, whose PSF returns NaN in
+# float32 with out_cell_ids (fixed in 2026.10.1) and has no bounded fit (clip=, 2026.10.2).
+healpix-resample = ">=2026.10.2"
 # healpix-convert asks for torch (healpix-resample uses it); the CPU wheel is
 # enough here and the CUDA one does not fit on a normal working disk.
 torch = { version = ">=2.9.1", index = "https://download.pytorch.org/whl/cpu" }

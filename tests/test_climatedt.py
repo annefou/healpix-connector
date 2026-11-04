@@ -5,6 +5,7 @@ ours is the month-long request, the cache name that survives a date range, and
 the parameter table.
 """
 
+import numpy as np
 import pytest
 
 pytest.importorskip("healpix_convert")
@@ -71,3 +72,72 @@ def test_a_month_becomes_a_one_step_dggs_source():
     got = S.sample_cells(src, np.array([3, 5, 9], dtype=np.uint64), climatedt.DEPTH, steps=step)
     assert got["value"].tolist() == [281.0, 280.0, 282.0]
     assert ds["filled_by_fallback"].sel(cells=ds.cell_ids == 9).item() == 1
+
+
+def _sphere_grid_and_wgs84_cells():
+    """Climate DT's native grid near Iberia (depth 7 on a sphere), and WGS84 cells inside it."""
+    from types import SimpleNamespace
+
+    from healpix_geo import nested
+
+    from healpix_connector.conventions import ELLIPSOID
+
+    lon, lat = np.meshgrid(np.arange(-14.0, 8.0, 0.25), np.arange(32.0, 48.0, 0.25))
+    native = np.unique(nested.lonlat_to_healpix(lon.ravel(), lat.ravel(), climatedt.DEPTH,
+                                                ellipsoid="sphere"))
+    nlon, nlat = nested.healpix_to_lonlat(native, climatedt.DEPTH, ellipsoid="sphere")
+    nlon = (np.asarray(nlon) + 180.0) % 360.0 - 180.0  # healpix-geo returns 0..360
+    lon, lat = np.meshgrid(np.arange(-9.0, 3.0, 0.25), np.arange(36.0, 44.0, 0.25))
+    cells = np.unique(nested.lonlat_to_healpix(lon.ravel(), lat.ravel(), climatedt.DEPTH,
+                                               ellipsoid=ELLIPSOID)).astype(np.int64)
+    grid = SimpleNamespace(longitude=SimpleNamespace(values=np.asarray(nlon)),
+                           latitude=SimpleNamespace(values=np.asarray(nlat)))
+    return grid, np.asarray(nlon), np.asarray(nlat), cells
+
+
+def test_psf_on_precipitation_is_a_bounded_fit():
+    """A sharp edge makes the unbounded PSF ring below zero; ``tprate`` must not."""
+    pytest.importorskip("healpix_resample")
+    grid, lon, lat, cells = _sphere_grid_and_wgs84_cells()
+    # a rain band with a sharp edge, zero elsewhere: the worst case for a deconvolution
+    rain = np.where((lon > -4.0) & (lon < -1.0), 1e-4, 0.0)
+
+    sampler = climatedt.MonthlySampler(cells, ["tprate", "u10"], method="psf")
+    sampler._build_resampler(grid)
+    free, n_free = sampler._resample("u10", rain)  # a signed variable: no bound
+    bounded, n_held = sampler._resample("tprate", rain)
+
+    assert n_free is None
+    # the ringing this guards against: measured -0.67 x the band, 148 of 381 cells
+    assert np.nanmin(free) < -0.3e-4
+    assert np.nanmin(bounded) >= 0
+    assert n_held >= np.sum(free < 0)
+    # the bound reshapes the field near the edges only; 3 degrees away it agrees
+    from healpix_geo import nested
+
+    clon, _ = nested.healpix_to_lonlat(cells.astype(np.uint64), climatedt.DEPTH,
+                                       ellipsoid="WGS84")
+    clon = (np.asarray(clon) + 180.0) % 360.0 - 180.0
+    far = (np.abs(clon + 4.0) > 3.0) & (np.abs(clon + 1.0) > 3.0)
+    assert far.sum() > 50
+    np.testing.assert_allclose(bounded[far], free[far], atol=1e-6)
+
+
+def test_bilinear_conservative_reports_no_clipping():
+    grid, lon, lat, cells = _sphere_grid_and_wgs84_cells()
+    sampler = climatedt.MonthlySampler(cells, ["tprate"], method="bilinear_conservative")
+    sampler._build_resampler(grid)
+    values, n = sampler._resample("tprate", np.full(lon.size, 2e-5))
+    assert n is None
+    np.testing.assert_allclose(values, 2e-5, rtol=1e-6)
+
+
+def test_a_bounded_variable_says_so_in_its_dataset():
+    m = climatedt.MonthlyMeans(year=2030, month=1, cell_ids=np.array([3, 5], dtype=np.int64),
+                               values={"tprate": np.array([0.0, 1e-5]),
+                                       "t2m": np.array([280.0, 281.0])},
+                               method="psf", support_m=0.0, filled_cells=np.array([], dtype=np.int64),
+                               clipped_cells={"tprate": 1})
+    ds = m.to_dataset()
+    assert ds["tprate"].attrs["resampling_lower_bound"] == 0.0
+    assert "resampling_lower_bound" not in ds["t2m"].attrs

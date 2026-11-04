@@ -18,6 +18,9 @@ through ``method``, restricted to the caller's cells (``out_cell_ids``), which
 is what makes a decade affordable. ``nearest`` is the default because PSF is a
 deconvolution: on precipitation it overshoots into negative values (114 of 480
 Iberian cells for a January mean), which a non-negative quantity cannot take.
+PSF is therefore solved with healpix-resample's bounded fit (``clip``, >= 2026.10.2)
+for the variables in ``LOWER_BOUND``: the bound is imposed inside the solve, not by
+clipping its result, and the number of cells held at it is reported per variable.
 ``bilinear_conservative`` (added 2026-10-23, ``healpix_connector.resampling``) is the
 recommended method: it preserves the field's integral, cannot ring, and against an
 exact polygon overlap it differs by 0.07 degC on average at depth 10. ``nearest``
@@ -31,7 +34,7 @@ every timestep and then averaging.
 from __future__ import annotations
 
 import calendar
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
@@ -59,6 +62,9 @@ PARAM_ID = {name: meta[0] for name, meta in
             {**cfg.CDT_SFC_VARIABLE_META, **EXTRA_PARAMS}.items()}
 #: PSF threshold healpix-convert uses for its optional ellipsoid correction.
 PSF_THRESHOLD = 0.5
+#: Physical lower bound of each variable the PSF fit must respect. Only those that
+#: ringing can push past their bound; temperatures (K) and pressure stay far from 0.
+LOWER_BOUND = {"tprate": 0.0}
 #: healpix-convert's declared resampler for these fields, and the alternative.
 METHODS = ("nearest", "psf", "bilinear_conservative")
 
@@ -105,6 +111,8 @@ class MonthlyMeans:
     support_m: float
     #: cells whose PSF kernel had too little support, filled by its own fallback
     filled_cells: np.ndarray
+    #: per variable, cells the bounded PSF fit held at ``LOWER_BOUND`` (PSF only)
+    clipped_cells: dict[str, int] = field(default_factory=dict)
 
     def to_dataset(self):
         """This month as a DGGS dataset with a one-step CF time axis (units as delivered).
@@ -118,6 +126,8 @@ class MonthlyMeans:
         variables = {name: (v[None, :], {"units": meta[name][1], "long_name": meta[name][2],
                                          "cell_methods": "time: mean"})
                      for name, v in self.values.items()}
+        for name in self.clipped_cells:  # solved as a bounded PSF fit
+            variables[name][1]["resampling_lower_bound"] = LOWER_BOUND[name]
         variables["filled_by_fallback"] = (
             np.isin(self.cell_ids, self.filled_cells).astype(np.int8),
             {"long_name": "1 where the PSF kernel had too little support and healpix-resample's "
@@ -141,8 +151,8 @@ class MonthlySampler:
     ``method="nearest"`` is healpix-convert's declared resampler for these
     fields. ``method="psf"`` uses its optional PSF correction instead; that one
     can leave cells with too little kernel support, which healpix-resample's own
-    fallback fills, and it is unsuitable for non-negative fields such as
-    precipitation (see the module docstring).
+    fallback fills, and on variables in ``LOWER_BOUND`` it is solved as a bounded
+    fit so that precipitation cannot go negative (see the module docstring).
     """
 
     def __init__(self, cell_ids, variables: list[str], *, method: str = "nearest",
@@ -191,6 +201,21 @@ class MonthlySampler:
         self._resampler = healpix_resample.PSFResampler(
             threshold=PSF_THRESHOLD, fill_missing_out_cells=bool(self._filled.size), **common)
 
+    def _resample(self, name: str, data: np.ndarray) -> tuple[np.ndarray, int | None]:
+        """One field onto ``cell_ids``; with PSF, also the cells held at the bound."""
+        if self.method == "bilinear_conservative":
+            mean, _ = self._resampler(data)
+            order = np.searchsorted(self._resampler.cell_ids, self.cell_ids.astype(np.uint64))
+            return mean[order], None
+        bounded = self.method == "psf" and name in LOWER_BOUND
+        if bounded:
+            res = self._resampler.resample(data, clip=(LOWER_BOUND[name], None))
+        else:
+            res = self._resampler.resample(data)
+        order = np.searchsorted(np.asarray(res.cell_ids), self.cell_ids)
+        n = int(np.sum(np.asarray(res.n_clipped_low))) if bounded else None
+        return np.asarray(res.cell_data, dtype=float)[order], n
+
     def month(self, year: int, month: int) -> MonthlyMeans:
         from healpix_connector.conventions import cell_size_m
 
@@ -199,24 +224,19 @@ class MonthlySampler:
         if self._resampler is None:
             self._build_resampler(ds)
 
-        values = {}
+        values, clipped = {}, {}
         for name in self.variables:
             t_dim = next((d for d in ("valid_time", "time") if d in ds[name].dims), None)
-            field = (ds[name].mean(t_dim) if t_dim else ds[name]).values.ravel().astype(float)
-            if self.method == "bilinear_conservative":
-                mean, _ = self._resampler(field)
-                order = np.searchsorted(self._resampler.cell_ids, self.cell_ids.astype(np.uint64))
-                values[name] = mean[order]
-                continue
-            res = self._resampler.resample(field)
-            order = np.searchsorted(np.asarray(res.cell_ids), self.cell_ids)
-            values[name] = np.asarray(res.cell_data, dtype=float)[order]
+            data = (ds[name].mean(t_dim) if t_dim else ds[name]).values.ravel().astype(float)
+            values[name], n = self._resample(name, data)
+            if n is not None:
+                clipped[name] = n
 
         if not self.keep_grib:
             conv._grib_path().unlink(missing_ok=True)
         return MonthlyMeans(year=year, month=month, cell_ids=self.cell_ids, values=values,
                             method=self.method, support_m=cell_size_m(DEPTH),
-                            filled_cells=self._filled)
+                            filled_cells=self._filled, clipped_cells=clipped)
 
 
 def month(year: int, month: int, variables: list[str], cell_ids, **kwargs) -> MonthlyMeans:
