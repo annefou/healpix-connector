@@ -12,7 +12,7 @@
     "recomputed_sd_sample_degC": 6.996,
     "ratio_to_population_sd": 100.0,
     "ratio_to_sample_sd": 95.74,
-    "documented": "degC, scale 0.1, offset 0 (file specification and GDAL tags)",
+    "documented": "degC, scale 0.1, offset 0 (file specification; the GeoTIFF has the scale and offset but no unit)",
     "actual": "100 x the population standard deviation, i.e. degC/100"
   },
   "bio12": {
