@@ -28,11 +28,56 @@ Every value it returns states its **support** (HEALPix depth), its **valid time*
 pixi run -e test test
 ```
 
-## Citing
+## How to cite
+
+### This software
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22904850.svg)](https://doi.org/10.5281/zenodo.22904850)
 
-Cite the concept DOI [10.5281/zenodo.22904850](https://doi.org/10.5281/zenodo.22904850) for the software, or the version DOI of the release you used ([10.5281/zenodo.22904851](https://doi.org/10.5281/zenodo.22904851) for v0.1.0, [10.5281/zenodo.23603498](https://doi.org/10.5281/zenodo.23603498) for v0.2.0). Metadata comes from `CITATION.cff`.
+Cite the **version you used**. Every result carries it as `producer` (e.g. `"healpix-connector 0.2.0"`) in its provenance.
+
+> Fouilloux, A., & LifeWatch ERIC (2026). *healpix-connector: connect existing data repositories to the HEALPix grid, with declared support, valid time and uncertainty* (Version 0.2.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.23603498
+
+```bibtex
+@software{healpix_connector_0_2_0,
+  author    = {Fouilloux, Anne and {LifeWatch ERIC}},
+  title     = {healpix-connector: connect existing data repositories to the HEALPix grid,
+               with declared support, valid time and uncertainty},
+  version   = {0.2.0},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.23603498},
+  url       = {https://doi.org/10.5281/zenodo.23603498}
+}
+```
+
+| Release | DOI |
+|---|---|
+| all versions (concept DOI, resolves to the latest) | [10.5281/zenodo.22904850](https://doi.org/10.5281/zenodo.22904850) |
+| v0.2.0 | [10.5281/zenodo.23603498](https://doi.org/10.5281/zenodo.23603498) |
+| v0.1.0 | [10.5281/zenodo.22904851](https://doi.org/10.5281/zenodo.22904851) |
+
+The metadata is in [`CITATION.cff`](CITATION.cff); GitHub's *Cite this repository* button reads it and exports APA and BibTeX.
+
+### The data behind a result
+
+Citing this library does not cite the data. Each repository has its own rules, and every connector and source returns what they ask for in its provenance, so a result can be cited without looking anything up again.
+
+| Data | What to cite | Where healpix-connector puts it |
+|---|---|---|
+| **GBIF**, published results | The **download DOI**, as GBIF requires; also state the taxonomy (`checklistKey`). Make a download for anything you publish: search results have no DOI. | `gbif.download_records(...).provenance`: `doi`, `checklist_key`, `download_created`, `predicate` |
+| GBIF, exploration | Not citable as it stands (no DOI). | `gbif.search(...).provenance`: `params`, `checklist_key`, `retrieved_at` |
+| **OBIS** | OBIS mints no DOI for a query: cite **each dataset**, plus the retrieval date. | `obis.search(...).provenance`: `datasets`, `retrieved_at`; then `obis.dataset_metadata(id)` for each dataset's `citation` and `doi` (`None` when it has none) |
+| **Darwin Core Archive** (IPT, OBIS export) | The archive's DOI where its EML states one, otherwise its title and package id. | `dwca.read(...).provenance`: `archive_doi`, `archive_title`, `retrieved_at` |
+| **CHELSA** v2.1 | Karger et al., CHELSA v2.1, EnviDat, [10.16904/envidat.228](https://doi.org/10.16904/envidat.228) (CC0-1.0), and the CHELSA paper: Karger et al. (2017), *Scientific Data* 4, 170122, [10.1038/sdata.2017.122](https://doi.org/10.1038/sdata.2017.122). | `sample.provenance(src, depth)`: `dataset_doi`, `license`; the STAC item has a `cite-as` link |
+| **Climate DT** (Destination Earth) | No DOI. Name the model, experiment, generation, resolution and period, and follow the terms of use of your DestinE access. | `climatedt.SOURCE`, `climatedt_gen2.json`; the dataset's `source`, `source_access` and `resampling_method` attributes |
+| Any other DGGS dataset (e.g. ERA5) | Its own DOI and licence. Set them when you write the dataset, or the result cannot carry them. | the dataset's `source_doi` and `license` attributes (e.g. `CoarseSample.to_dataset(..., source_doi=, license=)`) → `sample.provenance`: `dataset_doi`, `license` |
+
+When values were resampled or aggregated onto the grid, `sample.provenance` also states `source_depth`, `sampled_at_depth`, `resampling_method` and `period`. Report these in the methods section: the same cell id at a different depth, or from a different resampler, is a different number.
+
+### The GRID4EARTH tools it builds on
+
+If the grid handling matters to your result, cite these too: [healpix-resample](https://github.com/GRID4EARTH/healpix-resample) ([10.5281/zenodo.21723671](https://doi.org/10.5281/zenodo.21723671)), [healpix-geo](https://github.com/GRID4EARTH/healpix-geo) and [healpix-convert](https://github.com/GRID4EARTH/healpix-convert).
 
 ## Credits
 
