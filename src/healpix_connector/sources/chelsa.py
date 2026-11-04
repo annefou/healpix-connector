@@ -34,8 +34,8 @@ SOURCE = {
 # which read_window applies).
 BIO = {
     1: ("air_temperature", "degC", "Mean annual air temperature (BIO1)"),
-    # CHELSA's file specification and the GeoTIFF's own GDAL tags both give bio4
-    # as degC with scale 0.1 and no offset. The published values are 100x the
+    # CHELSA's file specification gives bio4 as degC with scale 0.1 and no offset;
+    # the GeoTIFF carries that scale and offset but no unit (nor a nodata value). The published values are 100x the
     # standard deviation, following WorldClim ("Temperature Seasonality (standard
     # deviation x100)"), which neither the specification nor the file says.
     # Checked against CHELSA's own monthly tas layers, 1981-2010, a 1-degree

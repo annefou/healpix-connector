@@ -1,7 +1,7 @@
 """Check CHELSA's published bioclimatic layers against its own monthly layers.
 
-CHELSA's file specification and the GeoTIFFs' GDAL tags both describe bio4 as
-degC with scale 0.1. Recomputing it from the monthly temperature layers of the
+CHELSA's file specification describes bio4 as degC with scale 0.1; the GeoTIFFs
+carry the scale (0.1, offset 0) but no unit at all. Recomputing it from the monthly temperature layers of the
 same climatology shows the published values are 100x the standard deviation -
 WorldClim's convention ("standard deviation x100"), which CHELSA does not state.
 
@@ -48,7 +48,7 @@ def main():
             "recomputed_sd_sample_degC": round(sd_sample, 3),
             "ratio_to_population_sd": round(pub[4] / sd_pop, 2),
             "ratio_to_sample_sd": round(pub[4] / sd_sample, 2),
-            "documented": "degC, scale 0.1, offset 0 (file specification and GDAL tags)",
+            "documented": "degC, scale 0.1, offset 0 (file specification; the GeoTIFF has the scale and offset but no unit)",
             "actual": "100 x the population standard deviation, i.e. degC/100",
         },
         "bio12": {"published": round(pub[12], 1), "recomputed_annual_sum": round(annual, 1),

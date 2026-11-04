@@ -15,14 +15,23 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]   # the two platforms in pixi.toml (linux-64, osx-arm64)
+        # climatedt adds healpix-convert, healpix-resample and CPU torch (~1.9 GB): it is
+        # what catches a lock update that changes the healpix-convert API we rely on.
+        env: [test, climatedt]
+        # The guard is platform-independent, and the climatedt environment is the heaviest;
+        # hosted macOS arm64 runners repeatedly failed to pick it up (2026-11-04).
+        exclude:
+          - os: macos-latest
+            env: climatedt
+    name: ${{ matrix.env }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
       - uses: prefix-dev/setup-pixi@v0.9.6
         with:
           pixi-version: v0.68.1
-          environments: test
+          environments: ${{ matrix.env }}
           locked: true
           cache: true
       # Offline: synthetic fields and recorded fixtures, no account and no download.
-      - run: pixi run -e test test
+      - run: pixi run -e ${{ matrix.env }} test

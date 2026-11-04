@@ -92,8 +92,8 @@ biodiversity extension" (shared Claude Doc; ask Anne for the link).
 - CHELSA's published bio layers, checked against its **own** monthly layers (a 1-degree
   window at 39N 6W, `examples/verify_chelsa_scaling.py`): `bio4` = **100 x the population
   standard deviation** (ratio 100.00; ddof=1 gives 95.74), which is WorldClim's convention
-  and is stated in neither the file specification nor the GeoTIFF's GDAL tags (both say
-  degC, scale 0.1, offset 0). `bio15` is a **coefficient of variation in percent**, not
+  and is stated nowhere: the file specification says degC, and the GeoTIFFs carry only
+  scale 0.1 / offset 0, no unit and no nodata (checked 2026-11-04). `bio15` is a **coefficient of variation in percent**, not
   kg m-2 as documented (ratio 1.000). `bio12` matches the sum of the 12 monthly layers
   exactly. The specification lives on EnviDat, not chelsa-climate.org, whose spec URLs 404.
 - The polytope client calls `sys.exit` on a refused request: catch `SystemExit`.
