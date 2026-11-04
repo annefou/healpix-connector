@@ -18,7 +18,7 @@ healpix-resample [#63](https://github.com/GRID4EARTH/healpix-resample/issues/63)
 | 3 | resample #65 | **closed 2026-10-15** by PR #72: `PSFResampler.resample(..., clip=(lo, hi), max_outer=10)`, a bounded (active-set) least-squares fit; `ResampleResults.n_clipped_low/high`. In releases >= 2026.10.2. Also closes healpix-convert #35 (use the bounded fit for bounded fields). Used here since PR #4 (`healpix-resample >= 2026.10.2`; `clip=(0.0, None)` for `tprate`). |
 | 4 | convert #12 | open, no reply |
 | 5 | convert #11 | **answered 2026-10-05** (benbovy): see below |
-| 6 | Climate DT generation 2 | drafted 2026-10-23, reworded 2026-11-04 after #11, not filed |
+| 6 | convert [#104](https://github.com/GRID4EARTH/healpix-convert/issues/104) | **filed 2026-11-04** (reworded after #11; paramIds and base request added) |
 
 **The answer to #11.** healpix-convert aims at a shared core (one internal data model in
 `ConvertStagingCache`/`ConvertSettings`, generic group converters in `healpix_converters`,
@@ -142,7 +142,7 @@ downstream and follow whatever pattern you prefer.
 
 ---
 
-## 6. healpix-convert — Climate DT generation 2: what the service offers, for the settings (drafted 2026-10-23, reworded 2026-11-04, not filed)
+## 6. healpix-convert — Climate DT generation 2: what the service offers, for the settings (filed 2026-11-04 as healpix-convert #104)
 
 **Title.** Climate DT generation 2 (incl. the monthly `clmn` stream): service facts for the settings
 
